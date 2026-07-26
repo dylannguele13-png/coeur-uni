@@ -14,8 +14,50 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Cœur Uni",
-  description: "Agence matrimoniale - Deux cœurs, une destinée.",
+  metadataBase: new URL("https://coeur-uni.com"),
+  title: {
+    default: "Cœur Uni | Agence Matrimoniale Africaine de Prestige",
+    template: "%s | Cœur Uni"
+  },
+  description: "Cœur Uni est l’agence matrimoniale de référence qui allie amour, respect et culture africaine pour des rencontres authentiques, sérieuses et durables.",
+  keywords: [
+    "Cœur Uni",
+    "agence matrimoniale",
+    "rencontres sérieuses",
+    "rencontres africaines",
+    "mariage chrétien",
+    "amour et culture",
+    "âme sœur",
+    "rencontres de prestige"
+  ],
+  openGraph: {
+    title: "Cœur Uni | Agence Matrimoniale Africaine de Prestige",
+    description: "Trouvez l’amour durable avec un accompagnement sur-mesure respectant les valeurs et la culture africaine.",
+    url: "https://coeur-uni.com",
+    siteName: "Cœur Uni",
+    images: [
+      {
+        url: "/logo-og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Cœur Uni - Agence Matrimoniale",
+      },
+      {
+        url: "/logo-wa.jpg",
+        width: 400,
+        height: 400,
+        alt: "Cœur Uni Logo",
+      }
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cœur Uni | Agence Matrimoniale",
+    description: "Trouvez l’amour durable avec un accompagnement sur-mesure.",
+    images: ["/logo-og.jpg"],
+  },
 };
 
 export const viewport: Viewport = {
