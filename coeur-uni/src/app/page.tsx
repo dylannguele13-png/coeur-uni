@@ -6,6 +6,9 @@ export default function Home() {
 
         <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
           <section className="space-y-6">
+            <div className="mx-auto mb-2 flex h-24 w-24 items-center justify-center rounded-full border border-[#d8b095] bg-[#fff2e5] p-4 shadow-sm shadow-[#8b4f3e]/10 sm:mx-0 sm:h-28 sm:w-28">
+              <img src="/logo.svg" alt="Logo Cœur Uni" className="h-full w-full object-contain" />
+            </div>
             <div className="inline-flex items-center gap-3 rounded-full border border-[#d8b095] bg-[#fff2e5] px-3 py-2 text-[0.7rem] uppercase tracking-[0.28em] text-[#8b4f3e] shadow-sm shadow-[#8b4f3e]/10 sm:px-4 sm:text-xs">
               Agence matrimoniale
             </div>
@@ -102,6 +105,95 @@ export default function Home() {
           <div className="rounded-[1.25rem] border border-[#d8b095] bg-white p-5 shadow-sm shadow-[#4f2b20]/5 sm:p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#8b4f3e]">Discrétion</p>
             <p className="mt-3 text-sm leading-6 text-[#5e4033]">Un suivi personnalisé et confidentiel à chaque étape.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="profiles" className="mt-10 rounded-[1.5rem] border border-[#d8b095] bg-[#fff2e5] p-6 shadow-sm shadow-[#4f2b20]/10 sm:p-8 lg:p-10">
+        <div className="max-w-7xl">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.32em] text-[#8b4f3e]">Profils sélectionnés</p>
+              <h2 className="mt-4 text-2xl font-semibold text-[#3f1f0f] sm:text-3xl">
+                Hommes sérieux disponibles maintenant.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-[#5e4033] sm:text-base">
+              Découvrez trois profils hauts de gamme, avec un contact direct via WhatsApp pour chaque profil.
+            </p>
+          </div>
+
+          <div className="mt-8 overflow-x-auto pb-4">
+            <div className="flex gap-5 snap-x snap-mandatory">
+              <article className="snap-start min-w-[20rem] max-w-[20rem] rounded-[1.75rem] border border-[#d8b095] bg-white p-5 shadow-sm shadow-[#4f2b20]/5 sm:min-w-[22rem]">
+                <div className="overflow-hidden rounded-[1.5rem] bg-[#fff4eb]">
+                  <img src="/duclair-felix.jpg" alt="Duclair Félix" className="h-52 w-full object-cover" />
+                </div>
+                <div className="mt-5 space-y-3">
+                  <h3 className="text-xl font-semibold text-[#3f1f0f]">Duclair Félix</h3>
+                  <p className="text-sm text-[#5e4033]">Belgique · Liège</p>
+                  <ul className="space-y-2 text-sm leading-6 text-[#5e4033]">
+                    <li><strong>Âge :</strong> 58 ans</li>
+                    <li><strong>Profession :</strong> PDG d’agence de construction</li>
+                    <li><strong>Situation :</strong> Célibataire avec 2 enfants</li>
+                  </ul>
+                </div>
+                <a
+                  href="https://wa.me/237683472130"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421]"
+                >
+                  Voir sur WhatsApp
+                </a>
+              </article>
+
+              <article className="snap-start min-w-[20rem] max-w-[20rem] rounded-[1.75rem] border border-[#d8b095] bg-white p-5 shadow-sm shadow-[#4f2b20]/5 sm:min-w-[22rem]">
+                <div className="overflow-hidden rounded-[1.5rem] bg-[#fff4eb]">
+                  <img src="/jules-amiens.jpg" alt="Jules Amiens" className="h-52 w-full object-cover" />
+                </div>
+                <div className="mt-5 space-y-3">
+                  <h3 className="text-xl font-semibold text-[#3f1f0f]">Jules Amiens</h3>
+                  <p className="text-sm text-[#5e4033]">France · Lyon</p>
+                  <ul className="space-y-2 text-sm leading-6 text-[#5e4033]">
+                    <li><strong>Âge :</strong> 49 ans</li>
+                    <li><strong>Profession :</strong> Avocat</li>
+                    <li><strong>Situation :</strong> Célibataire</li>
+                  </ul>
+                </div>
+                <a
+                  href="https://wa.me/237683472130"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421]"
+                >
+                  Voir sur WhatsApp
+                </a>
+              </article>
+
+              <article className="snap-start min-w-[20rem] max-w-[20rem] rounded-[1.75rem] border border-[#d8b095] bg-white p-5 shadow-sm shadow-[#4f2b20]/5 sm:min-w-[22rem]">
+                <div className="overflow-hidden rounded-[1.5rem] bg-[#fff4eb]">
+                  <img src="/pierre-castaud.jpg" alt="Pierre Castaud" className="h-52 w-full object-cover" />
+                </div>
+                <div className="mt-5 space-y-3">
+                  <h3 className="text-xl font-semibold text-[#3f1f0f]">Pierre Castaud</h3>
+                  <p className="text-sm text-[#5e4033]">France · Paris</p>
+                  <ul className="space-y-2 text-sm leading-6 text-[#5e4033]">
+                    <li><strong>Âge :</strong> 52 ans</li>
+                    <li><strong>Profession :</strong> Chirurgien neurologue</li>
+                    <li><strong>Situation :</strong> Divorcé avec une fille de 09 ans</li>
+                  </ul>
+                </div>
+                <a
+                  href="https://wa.me/237683472130"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421]"
+                >
+                  Voir sur WhatsApp
+                </a>
+              </article>
+            </div>
           </div>
         </div>
       </section>
