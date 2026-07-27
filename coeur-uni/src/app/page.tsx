@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const PROFILES = [
   {
@@ -131,8 +131,193 @@ const PROFILES = [
   },
 ];
 
+const TESTIMONIES_DATA = [
+  {
+    id: 1,
+    title: "Le début de notre bonheur",
+    couple: "Marie & Pierre-Henri",
+    location: "Paris, France",
+    videoUrl: "/videos/temoignage-1.mp4",
+    description: "Une rencontre évidente dès le premier appel WhatsApp. Notre mariage a célébré l'union de nos deux familles.",
+    likes: 124,
+    hearts: 89,
+    comments: [
+      { name: "Sylvie", avatar: "S", text: "Félicitations à vous deux !", date: "Il y a 3 jours" },
+      { name: "Marc", avatar: "M", text: "Quelle magnifique histoire !", date: "Il y a 1 jour" },
+      { name: "Carine", avatar: "C", text: "C'est tellement inspirant.", date: "Il y a 4 heures" }
+    ]
+  },
+  {
+    id: 2,
+    title: "L'amour n'a pas de frontières",
+    couple: "Sandrine & Marc",
+    location: "Genève, Suisse",
+    videoUrl: "/videos/temoignage-2.mp4",
+    description: "Marc a fait le premier pas en m'appelant depuis Genève. L'accompagnement de l'agence a été notre fil conducteur.",
+    likes: 95,
+    hearts: 64,
+    comments: [
+      { name: "Alice", avatar: "A", text: "Tellement heureuse pour toi Sandrine !", date: "Il y a 2 jours" },
+      { name: "Jules", avatar: "J", text: "Magnifique couple.", date: "Il y a 18 heures" }
+    ]
+  },
+  {
+    id: 3,
+    title: "Une destinée partagée",
+    couple: "Christiane & Sylvain",
+    location: "Bruxelles, Belgique",
+    videoUrl: "/videos/temoignage-3.mp4",
+    description: "Nous partageons les mêmes valeurs culturelles. Cœur Uni a su lire dans nos âmes pour nous réunir.",
+    likes: 78,
+    hearts: 53,
+    comments: [
+      { name: "Paul", avatar: "P", text: "Que Dieu bénisse votre union !", date: "Il y a 5 jours" },
+      { name: "Esther", avatar: "E", text: "Très beau couple.", date: "Il y a 2 jours" }
+    ]
+  },
+  {
+    id: 4,
+    title: "Le grand amour à 50 ans",
+    couple: "Jacqueline & Damien",
+    location: "Lyon, France",
+    videoUrl: "/videos/temoignage-4.mp4",
+    description: "Je ne pensais plus refaire ma vie. Damien a su me redonner le sourire. Merci infiniment à l'équipe.",
+    likes: 142,
+    hearts: 110,
+    comments: [
+      { name: "Hélène", avatar: "H", text: "Il n'est jamais trop tard pour aimer !", date: "Il y a 1 semaine" },
+      { name: "Antoine", avatar: "A", text: "Un grand merci à l'agence.", date: "Il y a 3 jours" }
+    ]
+  },
+  {
+    id: 5,
+    title: "Rencontre sincère",
+    couple: "Florence & Christophe",
+    location: "Nantes, France",
+    videoUrl: "/videos/temoignage-5.mp4",
+    description: "Pas de faux-semblants, que de la sincérité. Nous construisons aujourd'hui notre avenir ensemble avec beaucoup de sérénité.",
+    likes: 112,
+    hearts: 76,
+    comments: [
+      { name: "Thomas", avatar: "T", text: "C'est beau la sincérité.", date: "Il y a 4 jours" },
+      { name: "Laure", avatar: "L", text: "Longue vie à votre amour.", date: "Il y a 1 jour" }
+    ]
+  },
+  {
+    id: 6,
+    title: "Une évidence immédiate",
+    couple: "Nathalie & Steven",
+    location: "Chicago, USA",
+    videoUrl: "/videos/temoignage-6.mp4",
+    description: "La distance entre la France et les USA s'est effacée face à notre complicité immédiate. Une nouvelle vie commence.",
+    likes: 167,
+    hearts: 135,
+    comments: [
+      { name: "Mathilde", avatar: "M", text: "Sublime !", date: "Il y a 2 jours" },
+      { name: "Yann", avatar: "Y", text: "Le grand amour traverse les océans.", date: "Il y a 12 heures" }
+    ]
+  },
+  {
+    id: 7,
+    title: "Des valeurs communes",
+    couple: "Sophie & Jules",
+    location: "Toulouse, France",
+    videoUrl: "/videos/temoignage-7.mp4",
+    description: "Partager la même vision de la famille et du respect était essentiel pour moi. Jules est l'homme que j'attendais.",
+    likes: 88,
+    hearts: 60,
+    comments: [
+      { name: "Chantal", avatar: "C", text: "Le respect mutuel est la base.", date: "Il y a 6 jours" },
+      { name: "Gilles", avatar: "G", text: "Félicitations !", date: "Il y a 3 jours" }
+    ]
+  },
+  {
+    id: 8,
+    title: "Une merveilleuse complicité",
+    couple: "Audrey & Duclair",
+    location: "Liège, Belgique",
+    videoUrl: "/videos/temoignage-8.mp4",
+    description: "Chaque moment passé ensemble confirme que nous étions faits l'un pour l'autre. Une rencontre extraordinaire.",
+    likes: 104,
+    hearts: 82,
+    comments: [
+      { name: "Benoît", avatar: "B", text: "Que du bonheur !", date: "Il y a 3 jours" },
+      { name: "Valérie", avatar: "V", text: "Magnifique complicité.", date: "Il y a 1 jour" }
+    ]
+  },
+  {
+    id: 9,
+    title: "Le choix du cœur",
+    couple: "Amina & John",
+    location: "New York, USA",
+    videoUrl: "/videos/temoignage-9.mp4",
+    description: "John a su comprendre ma culture et mes racines. Cœur Uni a fait un travail d'accompagnement formidable.",
+    likes: 189,
+    hearts: 156,
+    comments: [
+      { name: "Fatim", avatar: "F", text: "L'amour multiculturel, c'est magnifique.", date: "Il y a 5 jours" },
+      { name: "David", avatar: "D", text: "Félicitations John.", date: "Il y a 2 jours" }
+    ]
+  }
+];
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [testimonies, setTestimonies] = useState(TESTIMONIES_DATA);
+  const [selectedTestimonyId, setSelectedTestimonyId] = useState<number | null>(null);
+  const [newCommentName, setNewCommentName] = useState("");
+  const [newCommentText, setNewCommentText] = useState("");
+  const [floatingHearts, setFloatingHearts] = useState<{ id: number; x: number }[]>([]);
+
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCommentText.trim() || selectedTestimonyId === null) return;
+    const author = newCommentName.trim() || "Visiteur anonyme";
+    const newComment = {
+      name: author,
+      avatar: author.charAt(0).toUpperCase(),
+      text: newCommentText.trim(),
+      date: "À l'instant"
+    };
+
+    setTestimonies((prev) =>
+      prev.map((t) => {
+        if (t.id === selectedTestimonyId) {
+          return {
+            ...t,
+            comments: [...t.comments, newComment]
+          };
+        }
+        return t;
+      })
+    );
+    setNewCommentText("");
+    setNewCommentName("");
+  };
+
+  const handleLike = (id: number) => {
+    setTestimonies((prev) =>
+      prev.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            likes: t.likes + 1,
+            hearts: t.hearts + 1
+          };
+        }
+        return t;
+      })
+    );
+    // Trigger floating heart
+    const idHeart = Date.now() + Math.random();
+    const x = Math.random() * 80 - 40;
+    setFloatingHearts((prev) => [...prev, { id: idHeart, x }]);
+    setTimeout(() => {
+      setFloatingHearts((prev) => prev.filter((h) => h.id !== idHeart));
+    }, 2000);
+  };
+
+  const selectedTestimony = testimonies.find((t) => t.id === selectedTestimonyId);
 
   const scrollPrev = () => {
     const container = containerRef.current;
@@ -417,6 +602,219 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* SECTION TÉMOIGNAGES VIDÉO */}
+      <section id="testimonies" className="mt-10 rounded-[1.5rem] border border-[#d8b095] bg-[#fff2e5]/80 p-6 shadow-sm shadow-[#4f2b20]/10 sm:p-8 lg:p-10">
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes floatUp {
+            0% {
+              transform: translate(0, 0) scale(0.6);
+              opacity: 0;
+            }
+            10% {
+              opacity: 1;
+              transform: translate(var(--x), -20px) scale(1.1);
+            }
+            100% {
+              transform: translate(calc(var(--x) * 1.5), -140px) scale(0.8);
+              opacity: 0;
+            }
+          }
+          .animate-float-heart {
+            animation: floatUp 1.8s ease-out forwards;
+          }
+        `}} />
+        <div>
+          <p className="text-sm uppercase tracking-[0.32em] text-[#8b4f3e]">Histoires de destinées</p>
+          <h2 className="mt-4 text-2xl font-semibold text-[#3f1f0f] sm:text-3xl">
+            Leurs plus belles évidences en vidéo.
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-[#5e4033]">
+            Découvrez en vidéo les retours sincères et les moments d'émotion de nos couples unis. L'amour authentique raconté par celles et ceux qui l'ont trouvé.
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {testimonies.map((testimony) => (
+            <article
+              key={testimony.id}
+              className="rounded-[1.75rem] border border-[#d8b095] bg-white p-5 shadow-sm shadow-[#4f2b20]/5 transition hover:shadow-md flex flex-col justify-between"
+            >
+              <div>
+                {/* Conteneur vidéo miniature */}
+                <div className="relative overflow-hidden rounded-[1.5rem] bg-black aspect-video group cursor-pointer" onClick={() => setSelectedTestimonyId(testimony.id)}>
+                  <video
+                    src={testimony.videoUrl}
+                    preload="none"
+                    className="h-full w-full object-cover opacity-80"
+                    muted
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition group-hover:bg-black/45">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-[#a92d27] shadow-lg transition group-hover:scale-110">
+                      ▶
+                    </div>
+                  </div>
+                  <span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold text-white tracking-wide">
+                    Témoignage
+                  </span>
+                </div>
+
+                {/* Titre & Couple */}
+                <div className="mt-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="rounded-full bg-[#a92d27]/10 px-3 py-1 text-xs font-semibold text-[#a92d27]">
+                      {testimony.location}
+                    </span>
+                    <div className="flex items-center gap-1.5 text-xs text-[#8b4f3e]">
+                      <span>❤</span> {testimony.likes}
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#3f1f0f] line-clamp-1">{testimony.title}</h3>
+                  <p className="text-sm font-semibold text-[#8b4f3e]">{testimony.couple}</p>
+                  <p className="text-sm leading-6 text-[#5e4033] line-clamp-2">
+                    {testimony.description}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedTestimonyId(testimony.id)}
+                className="mt-5 inline-flex w-full items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-4 py-2.5 text-sm font-semibold text-[#4f2b20] transition hover:bg-[#fff4eb] cursor-pointer font-sans"
+              >
+                Voir et réagir
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* MODAL INTERACTIF POUR LES TÉMOIGNAGES */}
+      {selectedTestimony && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-[#fffcf9] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col md:grid md:grid-cols-2 border border-[#d8b095]">
+            
+            {/* Colonne Gauche : Vidéo */}
+            <div className="bg-black relative flex items-center justify-center aspect-video md:aspect-auto md:h-full">
+              <video
+                src={selectedTestimony.videoUrl}
+                controls
+                autoPlay
+                className="w-full h-full object-contain"
+              />
+              <button 
+                onClick={() => setSelectedTestimonyId(null)}
+                className="absolute top-4 left-4 md:hidden w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Colonne Droite : Infos & Commentaires */}
+            <div className="p-6 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-none md:h-[80vh]">
+              {/* Header du témoignage */}
+              <div>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="rounded-full bg-[#a92d27]/10 px-3 py-1 text-xs font-semibold text-[#a92d27]">
+                      {selectedTestimony.location}
+                    </span>
+                    <h3 className="text-xl font-bold text-[#3f1f0f] mt-2 font-serif">{selectedTestimony.title}</h3>
+                    <p className="text-sm font-semibold text-[#8b4f3e]">{selectedTestimony.couple}</p>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedTestimonyId(null)}
+                    className="hidden md:flex p-2 hover:bg-[#fff0e5] rounded-full transition text-[#8b4f3e] cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p className="text-sm leading-relaxed text-[#5e4033] mt-3 bg-[#fff7f1] border border-[#f4d6c6] p-3 rounded-xl">
+                  {selectedTestimony.description}
+                </p>
+              </div>
+
+              {/* Zone commentaires et réactions */}
+              <div className="mt-4 flex-grow flex flex-col justify-end">
+                <div className="flex justify-between items-center pb-2 border-b border-[#f4d6c6] mb-3">
+                  <span className="text-xs font-semibold text-[#8b4f3e] uppercase tracking-wider">
+                    Commentaires ({selectedTestimony.comments.length})
+                  </span>
+                  
+                  {/* Bouton Like avec animation de cœurs */}
+                  <div className="relative">
+                    <button
+                      onClick={() => handleLike(selectedTestimony.id)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#a92d27] px-3.5 py-1.5 text-xs font-semibold text-white shadow-md hover:bg-[#8d2421] transition active:scale-95 cursor-pointer font-sans"
+                    >
+                      <span>❤</span> {selectedTestimony.likes} J'aime
+                    </button>
+                    {/* Cœurs flottants */}
+                    {floatingHearts.map((heart) => (
+                      <span
+                        key={heart.id}
+                        className="absolute bottom-6 left-1/2 text-lg text-[#a92d27] pointer-events-none animate-float-heart"
+                        style={{
+                          '--x': `${heart.x}px`,
+                        } as React.CSSProperties}
+                      >
+                        ❤
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Liste des commentaires */}
+                <div className="flex-1 overflow-y-auto space-y-3 max-h-[160px] md:max-h-[260px] pr-1">
+                  {selectedTestimony.comments.map((c, i) => (
+                    <div key={i} className="flex gap-2.5 items-start text-xs">
+                      <div className="w-7 h-7 rounded-full bg-[#a92d27]/15 flex items-center justify-center text-[#a92d27] font-bold shrink-0 font-sans">
+                        {c.avatar}
+                      </div>
+                      <div className="flex-1 bg-[#fffaf5] rounded-xl border border-[#f4d6c6] p-2.5">
+                        <div className="flex justify-between items-center mb-0.5">
+                          <span className="font-bold text-[#3f1f0f]">{c.name}</span>
+                          <span className="text-[9px] text-[#8b4f3e]">{c.date}</span>
+                        </div>
+                        <p className="text-[#5e4033] leading-relaxed font-sans">{c.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Formulaire d'ajout de commentaire */}
+                <form onSubmit={handleAddComment} className="mt-3 pt-3 border-t border-[#f4d6c6] space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Votre nom"
+                      value={newCommentName}
+                      onChange={(e) => setNewCommentName(e.target.value)}
+                      className="w-1/3 rounded-full border border-[#d8b095] bg-white px-3 py-1.5 text-xs text-[#3f1f0f] focus:outline-none focus:ring-1 focus:ring-[#a92d27] font-sans"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Ajouter un mot chaleureux..."
+                      value={newCommentText}
+                      onChange={(e) => setNewCommentText(e.target.value)}
+                      required
+                      className="w-2/3 rounded-full border border-[#d8b095] bg-white px-4 py-1.5 text-xs text-[#3f1f0f] focus:outline-none focus:ring-1 focus:ring-[#a92d27] font-sans"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-full bg-[#a92d27] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#8d2421] cursor-pointer font-sans"
+                    >
+                      Envoyer
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
 
       <section
         id="contact"
