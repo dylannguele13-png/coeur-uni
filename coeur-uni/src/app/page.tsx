@@ -102,6 +102,33 @@ const PROFILES = [
     matrimonial: "",
     image: "/christophe-delahaye.jpg",
   },
+  {
+    name: "Steven Spielberg",
+    country: "USA",
+    city: "Chicago (Origine: France/USA)",
+    age: "54 ans",
+    profession: "Comptable",
+    matrimonial: "",
+    image: "/steven-spielberg.jpg",
+  },
+  {
+    name: "Mark Ferran",
+    country: "Suisse",
+    city: "Genève (Nationalité: Espagnole)",
+    age: "48 ans",
+    profession: "Douanier",
+    matrimonial: "Un enfant",
+    image: "/mark-ferran.jpg",
+  },
+  {
+    name: "John Karl",
+    country: "USA",
+    city: "New York",
+    age: "48 ans",
+    profession: "Policier",
+    matrimonial: "Sans enfants",
+    image: "/john-karl.jpg",
+  },
 ];
 
 export default function Home() {
