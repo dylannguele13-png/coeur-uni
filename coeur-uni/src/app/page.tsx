@@ -404,7 +404,7 @@ export default function Home() {
             "contactPoint": {
               "@type": "ContactPoint",
               "contactType": "customer service",
-              "url": "https://wa.me/237683472130"
+              "url": "https://wa.me/message/W3QHNKHUPCBHG1"
             }
           })
         }}
@@ -580,7 +580,7 @@ export default function Home() {
                     </ul>
                   </div>
                   <a
-                    href="https://wa.me/237683472130"
+                    href="https://wa.me/message/W3QHNKHUPCBHG1"
                     target="_blank"
                     rel="noreferrer"
                     className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421]"
@@ -829,13 +829,13 @@ export default function Home() {
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <a
-            href="https://wa.me/237683472130"
+            href="https://wa.me/message/W3QHNKHUPCBHG1"
             className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421] sm:w-auto"
           >
             Écrire à l’agence
           </a>
           <a
-            href="https://wa.me/237683472130"
+            href="https://wa.me/message/W3QHNKHUPCBHG1"
             className="inline-flex w-full items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-6 py-3 text-sm font-semibold text-[#4f2b20] transition hover:bg-[#fff4eb] sm:w-auto"
           >
             Appelez-nous
