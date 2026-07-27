@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cœur Uni - Agence Matrimoniale
+
+Ce projet est l'application web de l'agence matrimoniale Cœur Uni, développée avec [Next.js](https://nextjs.org).
 
 ## Getting Started
 
