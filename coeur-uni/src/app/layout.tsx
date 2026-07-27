@@ -13,13 +13,19 @@ const playfair = Playfair_Display({
   weight: ["400", "500", "600", "700"],
 });
 
+const defaultUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "https://coeur-uni.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://coeur-uni.com"),
+  metadataBase: new URL(defaultUrl),
   title: {
-    default: "Cœur Uni | Agence Matrimoniale Africaine de Prestige",
+    default: "Cœur Uni | Rencontrez l’homme de votre vie",
     template: "%s | Cœur Uni"
   },
-  description: "Cœur Uni est l’agence matrimoniale de référence qui allie amour, respect et culture africaine pour des rencontres authentiques, sérieuses et durables.",
+  description: "Parcourez les profils et rencontrez l'homme de votre vie. Notre agence matrimoniale de prestige vous propose des rencontres sérieuses, authentiques et durables.",
   keywords: [
     "Cœur Uni",
     "agence matrimoniale",
@@ -31,9 +37,9 @@ export const metadata: Metadata = {
     "rencontres de prestige"
   ],
   openGraph: {
-    title: "Cœur Uni | Agence Matrimoniale Africaine de Prestige",
-    description: "Trouvez l’amour durable avec un accompagnement sur-mesure respectant les valeurs et la culture africaine.",
-    url: "https://coeur-uni.com",
+    title: "Cœur Uni | Rencontrez l’homme de votre vie",
+    description: "Parcourez les profils et rencontrez l'homme de votre vie. Notre agence matrimoniale de prestige vous propose des rencontres sérieuses et durables.",
+    url: defaultUrl,
     siteName: "Cœur Uni",
     images: [
       {
@@ -54,8 +60,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cœur Uni | Agence Matrimoniale",
-    description: "Trouvez l’amour durable avec un accompagnement sur-mesure.",
+    title: "Cœur Uni | Rencontrez l’homme de votre vie",
+    description: "Parcourez les profils et rencontrez l'homme de votre vie. Notre agence matrimoniale de prestige vous propose des rencontres sérieuses et durables.",
     images: ["/logo-og.jpg"],
   },
 };

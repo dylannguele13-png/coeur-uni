@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 const PROFILES = [
   {
     name: "Pierre Castaud",
@@ -71,9 +75,108 @@ const PROFILES = [
     matrimonial: "Célibataire",
     image: "/clement-antoine.jpg",
   },
+  {
+    name: "Damien Jules",
+    country: "France",
+    city: "Saint Etienne",
+    age: "53 ans",
+    profession: "Ingénieur en génie industriel",
+    matrimonial: "Célibataire avec une fille",
+    image: "/damien-jules.jpg",
+  },
+  {
+    name: "Sylvain Ekotto",
+    country: "USA",
+    city: "Chicago (Illinois)",
+    age: "52 ans",
+    profession: "Responsable d'entreprises",
+    matrimonial: "Célibataire avec une fille",
+    image: "/sylvain-ekotto.jpg",
+  },
+  {
+    name: "Christophe Delahaye",
+    country: "France",
+    city: "Nantes",
+    age: "58 ans",
+    profession: "PDG de boulangeries",
+    matrimonial: "",
+    image: "/christophe-delahaye.jpg",
+  },
 ];
 
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const scrollPrev = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    const article = container.querySelector("article");
+    const step = article ? article.clientWidth + 20 : 340;
+
+    if (container.scrollLeft <= 10) {
+      container.scrollTo({ left: container.scrollWidth, behavior: "smooth" });
+    } else {
+      container.scrollBy({ left: -step, behavior: "smooth" });
+    }
+  };
+
+  const scrollNext = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    const article = container.querySelector("article");
+    const step = article ? article.clientWidth + 20 : 340;
+    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+
+    if (container.scrollLeft >= maxScrollLeft - 10) {
+      container.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      container.scrollBy({ left: step, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let isHovered = false;
+
+    const handleMouseEnter = () => {
+      isHovered = true;
+    };
+    const handleMouseLeave = () => {
+      isHovered = false;
+    };
+
+    container.addEventListener("mouseenter", handleMouseEnter);
+    container.addEventListener("mouseleave", handleMouseLeave);
+    container.addEventListener("touchstart", handleMouseEnter);
+    container.addEventListener("touchend", handleMouseLeave);
+
+    const intervalId = setInterval(() => {
+      if (isHovered) return;
+
+      const scrollWidth = container.scrollWidth;
+      const clientWidth = container.clientWidth;
+      const maxScrollLeft = scrollWidth - clientWidth;
+
+      if (container.scrollLeft >= maxScrollLeft - 10) {
+        container.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        const article = container.querySelector("article");
+        const step = article ? article.clientWidth + 20 : 340;
+        container.scrollBy({ left: step, behavior: "smooth" });
+      }
+    }, 4000);
+
+    return () => {
+      clearInterval(intervalId);
+      container.removeEventListener("mouseenter", handleMouseEnter);
+      container.removeEventListener("mouseleave", handleMouseLeave);
+      container.removeEventListener("touchstart", handleMouseEnter);
+      container.removeEventListener("touchend", handleMouseLeave);
+    };
+  }, []);
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 xl:px-10 xl:py-12">
       <script
@@ -211,13 +314,32 @@ export default function Home() {
                 Hommes sérieux disponibles maintenant.
               </h2>
             </div>
-            <p className="max-w-2xl text-sm leading-6 text-[#5e4033] sm:text-base">
-              Découvrez nos profils haut de gamme, avec un contact direct via WhatsApp pour chaque profil.
-            </p>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <p className="max-w-2xl text-sm leading-6 text-[#5e4033] sm:text-base sm:text-right">
+                Découvrez nos profils haut de gamme, avec un contact direct via WhatsApp pour chaque profil.
+              </p>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#a92d27]/10 px-3 py-1 text-xs font-semibold text-[#a92d27] animate-pulse">
+                <span>◀</span> Glissez ou utilisez les boutons pour défiler <span>▶</span>
+              </span>
+            </div>
           </div>
 
-          <div className="mt-8 overflow-x-auto pb-4">
-            <div className="flex gap-5 snap-x snap-mandatory">
+          <div className="relative mt-8 group">
+            {/* Bouton Précédent */}
+            <button
+              onClick={scrollPrev}
+              className="absolute -left-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full border border-[#d8b095] bg-white p-3 text-sm font-bold text-[#8b4f3e] shadow-md transition hover:bg-[#fff4eb] hover:scale-105 active:scale-95 md:group-hover:flex focus:outline-none"
+              aria-label="Profil précédent"
+            >
+              ◀
+            </button>
+
+            {/* Conteneur défilant */}
+            <div
+              ref={containerRef}
+              className="flex gap-5 snap-x snap-mandatory overflow-x-auto pb-4 scroll-smooth"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
               {PROFILES.map((profile, index) => (
                 <article
                   key={index}
@@ -256,6 +378,15 @@ export default function Home() {
                 </article>
               ))}
             </div>
+
+            {/* Bouton Suivant */}
+            <button
+              onClick={scrollNext}
+              className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full border border-[#d8b095] bg-white p-3 text-sm font-bold text-[#8b4f3e] shadow-md transition hover:bg-[#fff4eb] hover:scale-105 active:scale-95 md:group-hover:flex focus:outline-none"
+              aria-label="Profil suivant"
+            >
+              ▶
+            </button>
           </div>
         </div>
       </section>
