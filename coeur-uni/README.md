@@ -1,6 +1,6 @@
 # Cœur Uni - Agence Matrimoniale
 
-Ce projet est l'application web de l'agence matrimoniale Cœur Uni, développée avec [Next.js](https://nextjs.org).
+Ce projet est l'application web de l'agence matrimoniale Cœur Uni, développée avec [Next.js](https://nextjs.org) et dediee a cavajal.
 
 ## Getting Started
 
