@@ -404,7 +404,7 @@ export default function Home() {
             "contactPoint": {
               "@type": "ContactPoint",
               "contactType": "customer service",
-              "url": "https://wa.me/237683472130"
+              "url": "https://wa.me/237680759137"
             }
           })
         }}
@@ -580,7 +580,7 @@ export default function Home() {
                     </ul>
                   </div>
                   <a
-                    href="https://wa.me/237683472130"
+                    href="https://wa.me/237680759137"
                     target="_blank"
                     rel="noreferrer"
                     className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421]"
@@ -605,7 +605,8 @@ export default function Home() {
 
       {/* SECTION TÉMOIGNAGES VIDÉO */}
       <section id="testimonies" className="mt-10 rounded-[1.5rem] border border-[#d8b095] bg-[#fff2e5]/80 p-6 shadow-sm shadow-[#4f2b20]/10 sm:p-8 lg:p-10">
-        <style dangerouslySetInnerHTML={{__html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           @keyframes floatUp {
             0% {
               transform: translate(0, 0) scale(0.6);
@@ -693,7 +694,7 @@ export default function Home() {
       {selectedTestimony && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-[#fffcf9] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col md:grid md:grid-cols-2 border border-[#d8b095]">
-            
+
             {/* Colonne Gauche : Vidéo */}
             <div className="bg-black relative flex items-center justify-center aspect-video md:aspect-auto md:h-full">
               <video
@@ -702,7 +703,7 @@ export default function Home() {
                 autoPlay
                 className="w-full h-full object-contain"
               />
-              <button 
+              <button
                 onClick={() => setSelectedTestimonyId(null)}
                 className="absolute top-4 left-4 md:hidden w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center font-bold"
               >
@@ -722,7 +723,7 @@ export default function Home() {
                     <h3 className="text-xl font-bold text-[#3f1f0f] mt-2 font-serif">{selectedTestimony.title}</h3>
                     <p className="text-sm font-semibold text-[#8b4f3e]">{selectedTestimony.couple}</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setSelectedTestimonyId(null)}
                     className="hidden md:flex p-2 hover:bg-[#fff0e5] rounded-full transition text-[#8b4f3e] cursor-pointer"
                   >
@@ -740,7 +741,7 @@ export default function Home() {
                   <span className="text-xs font-semibold text-[#8b4f3e] uppercase tracking-wider">
                     Commentaires ({selectedTestimony.comments.length})
                   </span>
-                  
+
                   {/* Bouton Like avec animation de cœurs */}
                   <div className="relative">
                     <button
@@ -829,13 +830,13 @@ export default function Home() {
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <a
-            href="https://wa.me/237683472130"
+            href="https://wa.me/237680759137"
             className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421] sm:w-auto"
           >
             Écrire à l’agence
           </a>
           <a
-            href="https://wa.me/237683472130"
+            href="https://wa.me/237680759137"
             className="inline-flex w-full items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-6 py-3 text-sm font-semibold text-[#4f2b20] transition hover:bg-[#fff4eb] sm:w-auto"
           >
             Appelez-nous
