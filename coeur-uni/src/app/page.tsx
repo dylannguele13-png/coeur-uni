@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 const PROFILES = [
   {
@@ -434,17 +435,17 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <Link
+                href="/register"
+                className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/25 transition hover:bg-[#8d2421] hover:scale-[1.02] sm:w-auto"
+              >
+                💕 Remplir la fiche d'inscription
+              </Link>
               <a
                 href="#contact"
-                className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421] sm:w-auto"
-              >
-                Contactez-nous
-              </a>
-              <a
-                href="#services"
                 className="inline-flex w-full items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-6 py-3 text-sm font-semibold text-[#4f2b20] transition hover:bg-[#fff4eb] sm:w-auto"
               >
-                Nos services
+                Contactez-nous
               </a>
             </div>
 
@@ -829,17 +830,17 @@ export default function Home() {
           Notre équipe est à votre écoute pour donner vie à votre rencontre et accompagner chaque moment avec bienveillance.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-          <a
-            href="https://wa.me/237680759137"
-            className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421] sm:w-auto"
+          <Link
+            href="/register"
+            className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/25 transition hover:bg-[#8d2421] hover:scale-[1.02] sm:w-auto"
           >
-            Écrire à l’agence
-          </a>
+            💕 Remplir la fiche d’inscription
+          </Link>
           <a
             href="https://wa.me/237680759137"
             className="inline-flex w-full items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-6 py-3 text-sm font-semibold text-[#4f2b20] transition hover:bg-[#fff4eb] sm:w-auto"
           >
-            Appelez-nous
+            Écrire à l’agence
           </a>
         </div>
       </section>
