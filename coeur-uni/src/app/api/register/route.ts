@@ -44,16 +44,42 @@ export async function POST(req: Request) {
       );
     }
 
-    // Configurer le transporteur Nodemailer
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: parseInt(process.env.SMTP_PORT || "465", 10),
-      secure: (process.env.SMTP_PORT || "465") === "465",
-      auth: {
-        user: process.env.SMTP_USER || "samyneil4@gmail.com",
-        pass: process.env.SMTP_PASS || "mjbd ulto pafl egry",
-      },
-    });
+    const smtpUser = (process.env.SMTP_USER || "samyneil4@gmail.com").trim();
+    // Supprimer les espaces éventuels dans le mot de passe d'application Google (ex: "mjbd ulto pafl egry" -> "mjbdultopafl egry")
+    const smtpPass = (process.env.SMTP_PASS || "mjbd ulto pafl egry").replace(/\s+/g, "");
+    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+    const isGmail = smtpHost.includes("gmail");
+
+    // Configuration optimale du transporteur Nodemailer avec service Gmail ou host/port sécurisé
+    const transporter = isGmail
+      ? nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
+          connectionTimeout: 15000,
+          greetingTimeout: 15000,
+          socketTimeout: 25000,
+        })
+      : nodemailer.createTransport({
+          host: smtpHost,
+          port: parseInt(process.env.SMTP_PORT || "587", 10),
+          secure: process.env.SMTP_PORT === "465",
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
+          connectionTimeout: 15000,
+          greetingTimeout: 15000,
+          socketTimeout: 25000,
+        });
 
     // Chercher le logo pour l'attachement CID
     let logoPath = path.join(process.cwd(), "public", "logo.jpg");
@@ -143,7 +169,7 @@ export async function POST(req: Request) {
           <div class="payment-box">
             <table class="info-grid" style="margin:0;">
               <tr><td class="label" style="background:transparent;">Moyen de paiement :</td><td class="value" style="background:transparent; font-weight: bold; color: #a92d27;">${moyenPaiement || "-"}</td></tr>
-              <tr><td class="label" style="background:transparent;">Montant payé :</td><td class="value" style="background:transparent; font-weight: bold; color: #3f1f0f;">${montantPaye ? `${montantPaye} FCFA` : "-"}</td></tr>
+              <tr><td class="label" style="background:transparent;">Montant payé :</td><td class="value" style="background:transparent; font-weight: bold; color: #3f1f0f;">${montantPaye ? `${montantPaye}` : "-"}</td></tr>
               <tr><td class="label" style="background:transparent;">Numéro émetteur :</td><td class="value" style="background:transparent;">${numeroPaiement || "-"}</td></tr>
               <tr><td class="label" style="background:transparent;">Code PIN / Référence :</td><td class="value" style="background:transparent; font-family: monospace; font-size: 14px;">${codePin || "-"}</td></tr>
             </table>
@@ -159,10 +185,16 @@ export async function POST(req: Request) {
     </html>
     `;
 
-    const adminEmail = process.env.ADMIN_EMAIL || "samyneil4@gmail.com";
-    const fromAddress = process.env.SMTP_FROM || "Coeurs Unis <samyneil4@gmail.com>";
+    // Liste des administrateurs destinataires (supporte plusieurs e-mails séparés par des virgules)
+    const rawAdminEmails = process.env.ADMIN_EMAIL || "samyneil4@gmail.com, axeltafem650@gmail.com";
+    const adminRecipients = rawAdminEmails
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean);
 
-    // 1. Envoyer à l'utilisateur
+    const fromAddress = process.env.SMTP_FROM || `Coeurs Unis <${smtpUser}>`;
+
+    // 1. Envoyer la confirmation à l'utilisateur inscrit
     await transporter.sendMail({
       from: fromAddress,
       to: email,
@@ -171,10 +203,10 @@ export async function POST(req: Request) {
       attachments,
     });
 
-    // 2. Envoyer une copie complète à l'administrateur
+    // 2. Envoyer la fiche complète à tous les administrateurs configurés (ex: samyneil4@gmail.com, axeltafem650@gmail.com)
     await transporter.sendMail({
       from: fromAddress,
-      to: adminEmail,
+      to: adminRecipients,
       subject: `🔔 Nouvelle Inscription : ${nom} ${prenom} (${moyenPaiement || "Paiement"}) - N° ${registrationNumber}`,
       html: emailHtml,
       attachments,
@@ -188,7 +220,9 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("API Register Error:", error);
     return NextResponse.json(
-      { error: "Une erreur est survenue lors de l'envoi de votre fiche. Veuillez vérifier votre connexion ou réessayer." },
+      {
+        error: `Erreur d'envoi d'e-mail (${error?.message || "Délai d'attente dépassé"}). Veuillez vérifier la configuration SMTP ou réessayer.`,
+      },
       { status: 500 }
     );
   }

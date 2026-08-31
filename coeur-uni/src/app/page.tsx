@@ -405,7 +405,7 @@ export default function Home() {
             "contactPoint": {
               "@type": "ContactPoint",
               "contactType": "customer service",
-              "url": "https://wa.me/237680759137"
+              "url": "https://wa.me/237692778575"
             }
           })
         }}
@@ -581,7 +581,7 @@ export default function Home() {
                     </ul>
                   </div>
                   <a
-                    href="https://wa.me/237680759137"
+                    href="https://wa.me/237692778575"
                     target="_blank"
                     rel="noreferrer"
                     className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/20 transition hover:bg-[#8d2421]"
@@ -837,7 +837,7 @@ export default function Home() {
             💕 Remplir la fiche d’inscription
           </Link>
           <a
-            href="https://wa.me/237680759137"
+            href="https://wa.me/237692778575"
             className="inline-flex w-full items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-6 py-3 text-sm font-semibold text-[#4f2b20] transition hover:bg-[#fff4eb] sm:w-auto"
           >
             Écrire à l’agence

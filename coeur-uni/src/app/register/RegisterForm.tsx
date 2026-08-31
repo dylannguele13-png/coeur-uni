@@ -310,7 +310,7 @@ export default function RegisterForm() {
             Retour à l'accueil
           </Link>
           <a
-            href="https://wa.me/237680759137"
+            href="https://wa.me/237692778575"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-full border border-[#a92d27] bg-white px-8 py-3 text-sm font-semibold text-[#a92d27] transition hover:bg-[#fff0e5]"
@@ -374,22 +374,20 @@ export default function RegisterForm() {
               type="button"
               onClick={() => s.num <= step && setStep(s.num)}
               disabled={s.num > step}
-              className={`flex flex-col items-center gap-1 text-center transition ${
-                s.num === step
-                  ? "text-[#a92d27] font-bold scale-105"
-                  : s.num < step
+              className={`flex flex-col items-center gap-1 text-center transition ${s.num === step
+                ? "text-[#a92d27] font-bold scale-105"
+                : s.num < step
                   ? "text-[#6b4437] hover:text-[#a92d27] cursor-pointer"
                   : "text-gray-400 opacity-50 cursor-not-allowed"
-              }`}
+                }`}
             >
               <div
-                className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-semibold transition ${
-                  s.num === step
-                    ? "bg-[#a92d27] text-white shadow-md shadow-[#a92d27]/30 ring-4 ring-[#a92d27]/20"
-                    : s.num < step
+                className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-semibold transition ${s.num === step
+                  ? "bg-[#a92d27] text-white shadow-md shadow-[#a92d27]/30 ring-4 ring-[#a92d27]/20"
+                  : s.num < step
                     ? "bg-[#fff2e5] text-[#a92d27] border border-[#d8b095]"
                     : "bg-gray-100 text-gray-400 border border-gray-200"
-                }`}
+                  }`}
               >
                 {s.num < step ? "✓" : s.icon}
               </div>
@@ -559,11 +557,10 @@ export default function RegisterForm() {
                   {SITUATION_MATRIMONIALE_OPTIONS.map((opt) => (
                     <label
                       key={opt}
-                      className={`flex cursor-pointer items-center justify-center rounded-2xl border p-3 text-xs font-semibold transition ${
-                        formData.situationMatrimoniale === opt
-                          ? "border-[#a92d27] bg-[#a92d27] text-white shadow-md shadow-[#a92d27]/20"
-                          : "border-[#d8b095] bg-white text-[#5e4033] hover:bg-[#fff2e5]"
-                      }`}
+                      className={`flex cursor-pointer items-center justify-center rounded-2xl border p-3 text-xs font-semibold transition ${formData.situationMatrimoniale === opt
+                        ? "border-[#a92d27] bg-[#a92d27] text-white shadow-md shadow-[#a92d27]/20"
+                        : "border-[#d8b095] bg-white text-[#5e4033] hover:bg-[#fff2e5]"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -680,11 +677,10 @@ export default function RegisterForm() {
                   {["Homme", "Femme"].map((sexe) => (
                     <label
                       key={sexe}
-                      className={`flex cursor-pointer items-center justify-center rounded-2xl border p-3 text-sm font-semibold transition ${
-                        formData.sexeRecherche === sexe
-                          ? "border-[#a92d27] bg-[#a92d27] text-white shadow-md shadow-[#a92d27]/20"
-                          : "border-[#d8b095] bg-white text-[#5e4033] hover:bg-[#fff2e5]"
-                      }`}
+                      className={`flex cursor-pointer items-center justify-center rounded-2xl border p-3 text-sm font-semibold transition ${formData.sexeRecherche === sexe
+                        ? "border-[#a92d27] bg-[#a92d27] text-white shadow-md shadow-[#a92d27]/20"
+                        : "border-[#d8b095] bg-white text-[#5e4033] hover:bg-[#fff2e5]"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -804,19 +800,17 @@ export default function RegisterForm() {
                 {PROJET_SENTIMENTAL_OPTIONS.map((opt) => (
                   <label
                     key={opt}
-                    className={`flex cursor-pointer items-center justify-between rounded-2xl border p-4 text-sm font-semibold transition ${
-                      formData.projetSentimental === opt
-                        ? "border-[#a92d27] bg-[#fff2e5] text-[#a92d27] shadow-sm ring-2 ring-[#a92d27]/20"
-                        : "border-[#d8b095] bg-white text-[#5e4033] hover:bg-[#fff9f2]"
-                    }`}
+                    className={`flex cursor-pointer items-center justify-between rounded-2xl border p-4 text-sm font-semibold transition ${formData.projetSentimental === opt
+                      ? "border-[#a92d27] bg-[#fff2e5] text-[#a92d27] shadow-sm ring-2 ring-[#a92d27]/20"
+                      : "border-[#d8b095] bg-white text-[#5e4033] hover:bg-[#fff9f2]"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`flex h-5 w-5 items-center justify-center rounded-full border ${
-                          formData.projetSentimental === opt
-                            ? "border-[#a92d27] bg-[#a92d27] text-white"
-                            : "border-[#d8b095]"
-                        }`}
+                        className={`flex h-5 w-5 items-center justify-center rounded-full border ${formData.projetSentimental === opt
+                          ? "border-[#a92d27] bg-[#a92d27] text-white"
+                          : "border-[#d8b095]"
+                          }`}
                       >
                         {formData.projetSentimental === opt && <span className="text-[10px]">✓</span>}
                       </div>
@@ -873,11 +867,10 @@ export default function RegisterForm() {
                   {PAYMENT_METHODS.map((pm) => (
                     <label
                       key={pm.id}
-                      className={`relative flex flex-col items-center justify-between rounded-2xl border p-3.5 text-center cursor-pointer transition ${
-                        formData.moyenPaiement === pm.name
-                          ? "border-[#a92d27] bg-[#fff2e5] shadow-md shadow-[#a92d27]/15 ring-2 ring-[#a92d27]"
-                          : "border-[#d8b095] bg-white hover:bg-[#fff9f2] hover:border-[#a92d27]/40"
-                      }`}
+                      className={`relative flex flex-col items-center justify-between rounded-2xl border p-3.5 text-center cursor-pointer transition ${formData.moyenPaiement === pm.name
+                        ? "border-[#a92d27] bg-[#fff2e5] shadow-md shadow-[#a92d27]/15 ring-2 ring-[#a92d27]"
+                        : "border-[#d8b095] bg-white hover:bg-[#fff9f2] hover:border-[#a92d27]/40"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -948,7 +941,7 @@ export default function RegisterForm() {
                     name="codePin"
                     value={formData.codePin}
                     onChange={handleChange}
-                    placeholder="Code PIN ou ID de transaction du reçu"
+                    placeholder="Code PIN "
                     className="w-full rounded-2xl border border-[#d8b095] bg-white px-4 py-3 text-sm font-mono text-[#3f1f0f] shadow-sm transition focus:border-[#a92d27] focus:outline-none focus:ring-2 focus:ring-[#a92d27]/20"
                   />
                   <p className="mt-1 text-[11px] text-[#8b4f3e]">
