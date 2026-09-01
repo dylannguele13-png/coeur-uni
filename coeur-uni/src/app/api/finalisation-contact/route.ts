@@ -51,8 +51,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const smtpUser = (process.env.SMTP_USER || "samyneil4@gmail.com").trim();
-    const smtpPass = (process.env.SMTP_PASS || "mjbd ulto pafl egry").replace(/\s+/g, "");
+    const smtpUser = (process.env.SMTP_USER || "joinvesting.mail@gmail.com").trim();
+    const smtpPass = (process.env.SMTP_PASS || "lrnr clxu soxx cpaq").replace(/\s+/g, "");
     const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
     const isGmail = smtpHost.includes("gmail");
 
