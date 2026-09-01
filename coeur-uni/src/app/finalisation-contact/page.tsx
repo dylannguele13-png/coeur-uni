@@ -1,33 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import RegisterForm from "./RegisterForm";
+import FinalisationForm from "./FinalisationForm";
 
 export const metadata: Metadata = {
-  title: "Fiche d'Inscription | Cœur Uni - Agence Matrimoniale de Prestige",
+  title: "Finalisation de Mise en Contact | Cœur Uni - Agence Matrimoniale de Prestige",
   description:
-    "Remplissez votre fiche d'inscription officielle auprès de l'Agence Matrimoniale Cœur Uni. Rencontrez l'homme ou la femme de votre vie grâce à nos profils vérifiés et un accompagnement sur-mesure.",
+    "Effectuez le bilan de vos échanges et préparez les prochaines étapes avec votre correspondant(e). Vos réponses permettent à l'Agence Matrimoniale Cœur Uni d'améliorer continuellement la qualité de ses services et de faciliter votre future rencontre.",
   keywords: [
-    "Inscription Cœur Uni",
-    "Fiche d'inscription matrimoniale",
-    "Rencontres sérieuses",
-    "Agence matrimoniale Afrique",
-    "Mariage et amour véritable",
-    "Âme sœur",
-    "Rencontre de prestige",
+    "Finalisation mise en relation",
+    "Suivi correspondants",
+    "Bilan de rencontre Cœur Uni",
+    "Rencontre sérieuse",
+    "Agence matrimoniale de prestige",
+    "Voyage de rencontre amoureuse",
+    "Mariage et concrétisation",
   ],
   openGraph: {
-    title: "Rejoignez Cœur Uni | Fiche d'Inscription Officielle",
+    title: "Finalisation de Mise en Relation | Cœur Uni",
     description:
-      "Parce que chaque cœur mérite de rencontrer son âme sœur. Remplissez votre fiche d'inscription en ligne et laissez notre comité d'accompagnement vous guider vers le grand amour.",
-    url: "https://coeur-uni.vercel.app/register",
+      "Partagez le bilan de vos échanges avec votre correspondant(e). L'agence Cœur Uni vous accompagne pas à pas vers la concrétisation de votre histoire d'amour.",
+    url: "https://coeur-uni.vercel.app/finalisation-contact",
     siteName: "Cœur Uni",
     images: [
       {
-        url: "/og-register.jpg",
+        url: "/og-finalisation.jpg",
         width: 1200,
         height: 675,
         type: "image/jpeg",
-        alt: "Agence Matrimoniale Cœur Uni - Fiche d'Inscription",
+        alt: "Cœur Uni - Finalisation de Mise en Relation",
       },
       {
         url: "/logo-wa.jpg",
@@ -42,14 +42,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rejoignez Cœur Uni | Fiche d'Inscription Officielle",
+    title: "Finalisation de Mise en Relation | Cœur Uni",
     description:
-      "Remplissez votre fiche d'inscription en ligne et rencontrez l'homme ou la femme de votre vie avec Cœur Uni.",
-    images: ["/og-register.jpg"],
+      "Bilan de vos échanges et préparation de votre rencontre amoureuse avec l'Agence Matrimoniale Cœur Uni.",
+    images: ["/og-finalisation.jpg"],
   },
 };
 
-export default function RegisterPage() {
+export default function FinalisationPage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#fff8f2_0%,_#f1d8bb_40%,_#e8c0a5_100%)] text-[#3f1f0f] py-8 px-4 sm:px-6 lg:px-8">
       {/* Top Bar Navigation */}
@@ -72,10 +72,10 @@ export default function RegisterPage() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/finalisation-contact"
+            href="/register"
             className="hidden sm:inline-block text-xs font-semibold text-[#8b4f3e] hover:text-[#a92d27] transition"
           >
-            Bilan de mise en contact
+            Fiche d'inscription
           </Link>
           <Link
             href="/"
@@ -86,16 +86,16 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* Main Registration Form */}
-      <RegisterForm />
+      {/* Main Finalisation Form */}
+      <FinalisationForm />
 
       {/* Footer */}
       <footer className="mt-12 text-center text-xs text-[#8b4f3e] pb-6 border-t border-[#d8b095]/40 pt-6">
         <p className="font-semibold text-[#a92d27]">
           © {new Date().getFullYear()} Agence Matrimoniale Cœurs Unis. Tous droits réservés.
         </p>
-        <p className="mt-1 opacity-80">
-          Vos informations sont traitées avec la plus grande discrétion et protégées par notre engagement de confidentialité.
+        <p className="mt-1 opacity-80 max-w-xl mx-auto">
+          Les informations communiquées dans ce bilan permettent à l'Agence Cœur Uni d'assurer un suivi sur-mesure et d'améliorer continuellement la qualité de ses services dans la plus absolue confidentialité.
         </p>
       </footer>
     </main>

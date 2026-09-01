@@ -434,12 +434,18 @@ export default function Home() {
               Une agence qui unit l’amour, le respect et la culture africaine pour créer des rencontres authentiques et durables.
             </p>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 flex-wrap">
               <Link
                 href="/register"
                 className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/25 transition hover:bg-[#8d2421] hover:scale-[1.02] sm:w-auto"
               >
                 💕 Remplir la fiche d'inscription
+              </Link>
+              <Link
+                href="/finalisation-contact"
+                className="inline-flex w-full items-center justify-center rounded-full border border-[#a92d27]/40 bg-[#fff8f2] px-6 py-3 text-sm font-semibold text-[#a92d27] transition hover:bg-[#ffece0] sm:w-auto"
+              >
+                💌 Bilan de mise en contact
               </Link>
               <a
                 href="#contact"
@@ -829,12 +835,18 @@ export default function Home() {
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#5e4033]">
           Notre équipe est à votre écoute pour donner vie à votre rencontre et accompagner chaque moment avec bienveillance.
         </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4 flex-wrap">
           <Link
             href="/register"
             className="inline-flex w-full items-center justify-center rounded-full bg-[#a92d27] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#a92d27]/25 transition hover:bg-[#8d2421] hover:scale-[1.02] sm:w-auto"
           >
             💕 Remplir la fiche d’inscription
+          </Link>
+          <Link
+            href="/finalisation-contact"
+            className="inline-flex w-full items-center justify-center rounded-full border border-[#d8b095] bg-white px-6 py-3.5 text-sm font-semibold text-[#a92d27] shadow-sm transition hover:bg-[#fff4eb] sm:w-auto"
+          >
+            💌 Bilan de mise en contact
           </Link>
           <a
             href="https://wa.me/237692778575"
