@@ -44,42 +44,21 @@ export async function POST(req: Request) {
       );
     }
 
-    const smtpUser = (process.env.SMTP_USER || "joinvesting.mail@gmail.com").trim();
-    // Supprimer les espaces éventuels dans le mot de passe d'application Google (ex: "lrnr clxu soxx cpaq" -> "lrnrclxusoxxcpaq")
-    const smtpPass = (process.env.SMTP_PASS || "lrnr clxu soxx cpaq").replace(/\s+/g, "");
-    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-    const isGmail = smtpHost.includes("gmail");
+    const host = process.env.SMTP_HOST || "smtp.gmail.com";
+    const port = parseInt(process.env.SMTP_PORT || "465", 10);
+    const user = process.env.SMTP_USER || "joinvesting.mail@gmail.com";
+    const pass = process.env.SMTP_PASS || "lrnr clxu soxx cpaq";
 
-    // Configuration optimale du transporteur Nodemailer avec service Gmail ou host/port sécurisé
-    const transporter = isGmail
-      ? nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-          tls: {
-            rejectUnauthorized: false,
-          },
-          connectionTimeout: 15000,
-          greetingTimeout: 15000,
-          socketTimeout: 25000,
-        })
-      : nodemailer.createTransport({
-          host: smtpHost,
-          port: parseInt(process.env.SMTP_PORT || "587", 10),
-          secure: process.env.SMTP_PORT === "465",
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-          tls: {
-            rejectUnauthorized: false,
-          },
-          connectionTimeout: 15000,
-          greetingTimeout: 15000,
-          socketTimeout: 25000,
-        });
+    // Configuration identique à joinvesting : host, port 465, secure: true
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: {
+        user,
+        pass,
+      },
+    });
 
     // Chercher le logo pour l'attachement CID
     let logoPath = path.join(process.cwd(), "public", "logo.jpg");
@@ -192,7 +171,7 @@ export async function POST(req: Request) {
       .map((e) => e.trim())
       .filter(Boolean);
 
-    const fromAddress = process.env.SMTP_FROM || `Coeurs Unis <${smtpUser}>`;
+    const fromAddress = process.env.SMTP_FROM || `Coeurs Unis <${user}>`;
 
     // 1. Envoyer la confirmation à l'utilisateur inscrit
     await transporter.sendMail({
