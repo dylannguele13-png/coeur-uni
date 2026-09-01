@@ -353,18 +353,18 @@ export default function RegisterForm() {
     };
 
     return (
-      <div className="mx-auto max-w-3xl rounded-3xl border border-[#d8b095] bg-[#fffaf5] p-6 sm:p-10 text-center shadow-2xl shadow-[#a92d27]/10 animate-in fade-in zoom-in-95 duration-500">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-[#c2185b] to-[#f48fb1] text-3xl text-white shadow-md">
+      <div className="mx-auto max-w-3xl rounded-3xl border-2 border-[#d4af37]/60 bg-[#fffbf5] p-6 sm:p-10 text-center shadow-2xl shadow-[#8b1e19]/15 animate-in fade-in zoom-in-95 duration-500">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-[#8b1e19] to-[#c59218] text-3xl text-white shadow-md">
           ✨
         </div>
-        <span className="rounded-full bg-[#c2185b]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#c2185b]">
-          Adhésion Officielle Validée
+        <span className="rounded-full bg-[#8b1e19]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#8b1e19] border border-[#8b1e19]/20">
+          Adhésion Officielle Cœur Uni
         </span>
         <h2 className="mt-3 font-serif text-2xl sm:text-3xl font-bold text-[#3f1f0f]">
           Félicitations, {formData.prenom} {formData.nom} !
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#6b4437] max-w-xl mx-auto">
-          Votre dossier d'inscription <strong>N° {formData.registrationNumber}</strong> a été enregistré avec succès. Voici votre <strong>Carte de Membre Officielle</strong> Cœurs Unis personnalisée :
+          Votre dossier d'inscription <strong>N° {formData.registrationNumber}</strong> a été validé. Voici votre <strong>Carte de Membre Officielle</strong> Cœur Uni personnalisée :
         </p>
 
         {/* CARTE DE MEMBRE EN GRAND AVEC BOUTONS D'ACTIONS (IMAGE HD, PDF, WHATSAPP) */}
@@ -373,11 +373,11 @@ export default function RegisterForm() {
         </div>
 
         {/* Info récapitulatif & WhatsApp */}
-        <div className="my-6 rounded-2xl border border-[#f0b69a] bg-[#fff2e5] p-5 text-left text-xs sm:text-sm text-[#3f1f0f]">
-          <p className="font-semibold text-[#a92d27] flex items-center gap-2">
+        <div className="my-6 rounded-2xl border border-[#d8b095] bg-[#fdf6ee] p-5 text-left text-xs sm:text-sm text-[#3f1f0f]">
+          <p className="font-semibold text-[#8b1e19] flex items-center gap-2">
             <span>📩</span> Un exemplaire haute définition de votre carte a été envoyé à :
           </p>
-          <p className="mt-1 font-mono text-xs font-bold text-[#5e4033] bg-white/80 p-2 rounded-lg border border-[#e8c0a5]">
+          <p className="mt-1 font-mono text-xs font-bold text-[#5e4033] bg-white/90 p-2 rounded-lg border border-[#e8c0a5]">
             {formData.email}
           </p>
           <p className="mt-3 text-xs leading-relaxed text-[#6b4437]">
@@ -394,7 +394,7 @@ export default function RegisterForm() {
           </Link>
           <Link
             href="/finalisation-contact"
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#a92d27] to-[#871d18] px-8 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:scale-[1.02]"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#8b1e19] to-[#6b1410] px-8 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:scale-[1.02] border border-[#d4af37]/50"
           >
             Bilan de mise en relation →
           </Link>
@@ -515,9 +515,9 @@ export default function RegisterForm() {
               </div>
 
               {/* Photo de profil pour la Carte de Membre Officielle */}
-              <div className="rounded-2xl border-2 border-dashed border-[#d8b095] bg-[#fffaf5] p-5 transition hover:border-[#c2185b]">
+              <div className="rounded-2xl border-2 border-dashed border-[#d8b095] bg-[#fffbf5] p-5 transition hover:border-[#8b1e19]">
                 <div className="flex flex-col sm:flex-row items-center gap-5">
-                  <div className="relative h-28 w-24 sm:h-32 sm:w-28 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-[#f48fb1] bg-[#fce4ec] shadow-md flex items-center justify-center">
+                  <div className="relative h-28 w-24 sm:h-32 sm:w-28 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-[#d4af37] bg-[#fdf3e7] shadow-md flex items-center justify-center">
                     {formData.photoProfil ? (
                       <img
                         src={formData.photoProfil}
@@ -525,23 +525,23 @@ export default function RegisterForm() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center text-center p-2 text-[#ad1457]">
+                      <div className="flex flex-col items-center justify-center text-center p-2 text-[#8b1e19]">
                         <span className="text-3xl">👤</span>
-                        <span className="text-[10px] font-bold mt-1 uppercase">Votre photo</span>
+                        <span className="text-[10px] font-bold mt-1 uppercase text-[#8b1e19]">Votre photo</span>
                       </div>
                     )}
                   </div>
 
                   <div className="flex-1 text-center sm:text-left">
-                    <label className="block text-sm font-bold text-[#c2185b]">
-                      Photo de profil (pour votre Carte de Membre Officielle) <span className="text-[#a92d27]">*</span>
+                    <label className="block text-sm font-bold text-[#8b1e19]">
+                      Photo d'identité (pour votre Carte de Membre Officielle) <span className="text-[#8b1e19]">*</span>
                     </label>
                     <p className="mt-1 text-xs text-[#6b4437] leading-relaxed">
                       Cette photo apparaîtra directement sur votre carte d'adhésion officielle et facilitera votre présentation auprès de nos correspondants. (Format JPG, PNG, WEBP).
                     </p>
 
                     <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                      <label className="inline-flex items-center gap-2 cursor-pointer rounded-full bg-gradient-to-r from-[#c2185b] to-[#ad1457] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:scale-[1.02]">
+                      <label className="inline-flex items-center gap-2 cursor-pointer rounded-full bg-gradient-to-r from-[#8b1e19] to-[#6b1410] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:scale-[1.02] border border-[#d4af37]/40">
                         <span>📷</span>
                         <span>{formData.photoProfil ? "Changer la photo" : "Ajouter ma photo"}</span>
                         <input
