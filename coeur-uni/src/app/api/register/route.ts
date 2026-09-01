@@ -35,6 +35,8 @@ export async function POST(req: Request) {
       montantPaye,
       numeroPaiement,
       codePin,
+      carteMembreDataUrl,
+      photoProfil,
     } = data;
 
     if (!nom || !prenom || !email || !telephone) {
@@ -67,7 +69,7 @@ export async function POST(req: Request) {
     }
 
     const hasLogo = fs.existsSync(logoPath);
-    const attachments = hasLogo
+    const attachments: any[] = hasLogo
       ? [
           {
             filename: "logo.jpg",
@@ -76,6 +78,22 @@ export async function POST(req: Request) {
           },
         ]
       : [];
+
+    // Attacher la Carte de Membre Officielle si fournie
+    const hasCard = typeof carteMembreDataUrl === "string" && carteMembreDataUrl.startsWith("data:image/");
+    if (hasCard) {
+      try {
+        const base64Data = carteMembreDataUrl.replace(/^data:image\/\w+;base64,/, "");
+        const cardBuffer = Buffer.from(base64Data, "base64");
+        attachments.push({
+          filename: `carte-membre-${registrationNumber || "CU-2026"}.png`,
+          content: cardBuffer,
+          cid: "cartemembre@coeursunis",
+        });
+      } catch (err) {
+        console.error("Erreur conversion carte base64:", err);
+      }
+    }
 
     const emailHtml = `
     <!DOCTYPE html>
@@ -152,6 +170,12 @@ export async function POST(req: Request) {
               <tr><td class="label" style="background:transparent;">Numéro émetteur :</td><td class="value" style="background:transparent;">${numeroPaiement || "-"}</td></tr>
               <tr><td class="label" style="background:transparent;">Code PIN / Référence :</td><td class="value" style="background:transparent; font-family: monospace; font-size: 14px;">${codePin || "-"}</td></tr>
             </table>
+          </div>
+
+          <div class="section-title">6. Carte de Membre Officielle Cœurs Unis</div>
+          <div style="text-align: center; margin: 20px 0; background: #fff8f2; padding: 20px; border-radius: 16px; border: 1.5px solid #d8b095;">
+            ${hasCard ? `<img src="cid:cartemembre@coeursunis" alt="Carte de Membre Cœurs Unis" style="max-width: 100%; border-radius: 14px; box-shadow: 0 10px 30px rgba(194,24,91,0.18); border: 2px solid #f48fb1;" />` : `<p style="font-style:italic; color:#6b4437;">Carte de membre en cours d'édition officielle.</p>`}
+            <p style="margin: 14px 0 0; font-size: 12px; color: #c2185b; font-weight: bold;">✨ Votre Carte de Membre officielle haute définition est également jointe en pièce jointe de cet e-mail.</p>
           </div>
         </div>
 

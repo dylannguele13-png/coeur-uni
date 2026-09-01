@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import MemberCard, { generateMemberCardDataUrl, MemberCardData } from "./MemberCard";
 
 const STORAGE_KEY = "coeur_uni_registration_draft_v1";
 
@@ -37,6 +38,7 @@ interface FormData {
   // 1. Infos Personnelles
   nom: string;
   prenom: string;
+  photoProfil: string;
   dateNaissance: string;
   lieuNaissance: string;
   paysResidence: string;
@@ -72,6 +74,7 @@ const DEFAULT_FORM_DATA: FormData = {
   registrationDate: "",
   nom: "",
   prenom: "",
+  photoProfil: "",
   dateNaissance: "",
   lieuNaissance: "",
   paysResidence: "",
@@ -106,6 +109,47 @@ export default function RegisterForm() {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [saveIndicator, setSaveIndicator] = useState<boolean>(false);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 8 * 1024 * 1024) {
+      setErrorMsg("La taille de l'image ne doit pas dépasser 8 Mo.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const maxDim = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.88);
+          setFormData((prev) => ({ ...prev, photoProfil: compressed }));
+          setErrorMsg("");
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Charger depuis le localStorage au montage pour garantir la persistance
   useEffect(() => {
@@ -239,9 +283,29 @@ export default function RegisterForm() {
           ? `Autre: ${formData.projetSentimentalAutre.trim()}`
           : formData.projetSentimental;
 
+      // Génération de la Carte de Membre Officielle conforme pour l'email
+      let carteMembreDataUrl = "";
+      try {
+        carteMembreDataUrl = await generateMemberCardDataUrl({
+          nom: formData.nom,
+          prenom: formData.prenom,
+          dateNaissance: formData.dateNaissance
+            ? formData.dateNaissance.split("-").reverse().join("/")
+            : "15/08/1995",
+          pays: formData.paysResidence || formData.nationalite || "Gabon",
+          profession: formData.profession || "Membre Adhérent",
+          matricule: formData.registrationNumber || "CU-2026-0808",
+          photoUrl: formData.photoProfil,
+          validite: "2026 / 2027",
+        });
+      } catch (errCard) {
+        console.error("Erreur génération carte de membre:", errCard);
+      }
+
       const payload = {
         ...formData,
         projetSentimental: finalProjetSentimental,
+        carteMembreDataUrl,
       };
 
       const res = await fetch("/api/register", {
@@ -275,48 +339,65 @@ export default function RegisterForm() {
   }
 
   if (isSubmitted) {
+    const cardData: MemberCardData = {
+      nom: formData.nom,
+      prenom: formData.prenom,
+      dateNaissance: formData.dateNaissance
+        ? formData.dateNaissance.split("-").reverse().join("/")
+        : "15/08/1995",
+      pays: formData.paysResidence || formData.nationalite || "Gabon",
+      profession: formData.profession || "Membre Adhérent",
+      matricule: formData.registrationNumber || "CU-2026-0808",
+      photoUrl: formData.photoProfil,
+      validite: "2026 / 2027",
+    };
+
     return (
-      <div className="mx-auto max-w-2xl rounded-3xl border border-[#d8b095] bg-[#fffaf5] p-8 text-center shadow-xl shadow-[#a92d27]/10 sm:p-12 animate-in fade-in zoom-in-95 duration-500">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#a92d27]/10 text-4xl text-[#a92d27]">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-[#d8b095] bg-[#fffaf5] p-6 sm:p-10 text-center shadow-2xl shadow-[#a92d27]/10 animate-in fade-in zoom-in-95 duration-500">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-[#c2185b] to-[#f48fb1] text-3xl text-white shadow-md">
           ✨
         </div>
-        <span className="rounded-full bg-[#a92d27]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#a92d27]">
-          Inscription confirmée
+        <span className="rounded-full bg-[#c2185b]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#c2185b]">
+          Adhésion Officielle Validée
         </span>
-        <h2 className="mt-4 font-serif text-3xl font-bold text-[#3f1f0f] sm:text-4xl">
-          Bienvenue parmi nous, {formData.prenom} !
+        <h2 className="mt-3 font-serif text-2xl sm:text-3xl font-bold text-[#3f1f0f]">
+          Félicitations, {formData.prenom} {formData.nom} !
         </h2>
-        <p className="mt-4 text-base leading-relaxed text-[#5e4033]">
-          Votre fiche d'inscription <strong>N° {formData.registrationNumber}</strong> a été transmise avec succès à notre équipe d'accompagnement de prestige.
+        <p className="mt-2 text-xs sm:text-sm text-[#6b4437] max-w-xl mx-auto">
+          Votre dossier d'inscription <strong>N° {formData.registrationNumber}</strong> a été enregistré avec succès. Voici votre <strong>Carte de Membre Officielle</strong> Cœurs Unis personnalisée :
         </p>
 
-        <div className="my-6 rounded-2xl border border-[#f0b69a] bg-[#fff2e5] p-5 text-left text-sm text-[#3f1f0f]">
+        {/* CARTE DE MEMBRE EN GRAND AVEC BOUTONS D'ACTIONS (IMAGE HD, PDF, WHATSAPP) */}
+        <div className="my-8">
+          <MemberCard data={cardData} />
+        </div>
+
+        {/* Info récapitulatif & WhatsApp */}
+        <div className="my-6 rounded-2xl border border-[#f0b69a] bg-[#fff2e5] p-5 text-left text-xs sm:text-sm text-[#3f1f0f]">
           <p className="font-semibold text-[#a92d27] flex items-center gap-2">
-            <span>📩</span> Un récapitulatif a été envoyé à votre adresse e-mail :
+            <span>📩</span> Un exemplaire haute définition de votre carte a été envoyé à :
           </p>
-          <p className="mt-1 font-mono text-xs font-bold text-[#5e4033] bg-white/70 p-2 rounded-lg border border-[#e8c0a5]">
+          <p className="mt-1 font-mono text-xs font-bold text-[#5e4033] bg-white/80 p-2 rounded-lg border border-[#e8c0a5]">
             {formData.email}
           </p>
           <p className="mt-3 text-xs leading-relaxed text-[#6b4437]">
-            Notre conseiller matrimonial vous contactera très prochainement au <strong>{formData.telephone}</strong> pour finaliser votre accompagnement et vous présenter vos premiers profils compatibles.
+            Pour accélérer le traitement prioritaire de votre dossier ou nous transmettre vos justificatifs complémentaires, vous pouvez joindre directement le secrétariat officiel sur WhatsApp au <strong>+237 692 77 87 75</strong>.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-full bg-[#a92d27] px-8 py-3 text-sm font-semibold text-white shadow-md shadow-[#a92d27]/30 transition hover:bg-[#8d2421]"
+            className="inline-flex items-center justify-center rounded-full border border-[#8b4f3e] bg-white px-8 py-3 text-xs font-bold uppercase tracking-wider text-[#4f2b20] transition hover:bg-[#fff2e5]"
           >
-            Retour à l'accueil
+            ← Retour à l'accueil
           </Link>
-          <a
-            href="https://wa.me/237692778575"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-full border border-[#a92d27] bg-white px-8 py-3 text-sm font-semibold text-[#a92d27] transition hover:bg-[#fff0e5]"
+          <Link
+            href="/finalisation-contact"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#a92d27] to-[#871d18] px-8 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:scale-[1.02]"
           >
-            Contacter par WhatsApp
-          </a>
+            Bilan de mise en relation →
+          </Link>
         </div>
       </div>
     );
@@ -429,8 +510,60 @@ export default function RegisterForm() {
                   1. Informations Personnelles
                 </h2>
                 <p className="text-xs text-[#8b4f3e]">
-                  Veuillez renseigner votre état civil et votre situation actuelle en toute sincérité.
+                  Veuillez renseigner votre état civil et ajouter votre photo de profil pour votre Carte de Membre Officielle.
                 </p>
+              </div>
+
+              {/* Photo de profil pour la Carte de Membre Officielle */}
+              <div className="rounded-2xl border-2 border-dashed border-[#d8b095] bg-[#fffaf5] p-5 transition hover:border-[#c2185b]">
+                <div className="flex flex-col sm:flex-row items-center gap-5">
+                  <div className="relative h-28 w-24 sm:h-32 sm:w-28 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-[#f48fb1] bg-[#fce4ec] shadow-md flex items-center justify-center">
+                    {formData.photoProfil ? (
+                      <img
+                        src={formData.photoProfil}
+                        alt="Aperçu photo de profil"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center p-2 text-[#ad1457]">
+                        <span className="text-3xl">👤</span>
+                        <span className="text-[10px] font-bold mt-1 uppercase">Votre photo</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 text-center sm:text-left">
+                    <label className="block text-sm font-bold text-[#c2185b]">
+                      Photo de profil (pour votre Carte de Membre Officielle) <span className="text-[#a92d27]">*</span>
+                    </label>
+                    <p className="mt-1 text-xs text-[#6b4437] leading-relaxed">
+                      Cette photo apparaîtra directement sur votre carte d'adhésion officielle et facilitera votre présentation auprès de nos correspondants. (Format JPG, PNG, WEBP).
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                      <label className="inline-flex items-center gap-2 cursor-pointer rounded-full bg-gradient-to-r from-[#c2185b] to-[#ad1457] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:scale-[1.02]">
+                        <span>📷</span>
+                        <span>{formData.photoProfil ? "Changer la photo" : "Ajouter ma photo"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handlePhotoUpload}
+                        />
+                      </label>
+
+                      {formData.photoProfil && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData((prev) => ({ ...prev, photoProfil: "" }))}
+                          className="rounded-full border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition cursor-pointer"
+                        >
+                          Supprimer
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
