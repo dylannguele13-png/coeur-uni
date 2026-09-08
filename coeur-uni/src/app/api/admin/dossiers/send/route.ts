@@ -55,16 +55,16 @@ export async function POST(req: Request) {
     };
 
     // Chercher le logo officiel du Cabinet BK pour l'attachement CID
-    const logoBkPath = path.join(process.cwd(), "public", "logo-cabinet-bk-.png");
+    const logoBkPath = path.join(process.cwd(), "public", "logo-cabinet-bk.jpeg");
     const hasLogoBk = fs.existsSync(logoBkPath);
     const attachments = hasLogoBk
       ? [
-          {
-            filename: "logo-cabinet-bk.png",
-            path: logoBkPath,
-            cid: "logo@cabinetbk",
-          },
-        ]
+        {
+          filename: "logo-cabinet-bk.jpeg",
+          path: logoBkPath,
+          cid: "logo@cabinetbk",
+        },
+      ]
       : [];
 
     // Génération du contenu HTML et texte
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 
     // 2. Envoi d'une copie aux administrateurs (samyneil4@gmail.com, axeltafem650@gmail.com)
     const adminEmailsRaw =
-      process.env.ADMIN_EMAILS || "samyneil4@gmail.com, axeltafem650@gmail.com";
+      process.env.ADMIN_EMAILS;
     const adminRecipients = adminEmailsRaw
       .split(",")
       .map((e) => e.trim())
