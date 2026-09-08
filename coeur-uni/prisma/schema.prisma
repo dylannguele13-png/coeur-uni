@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Registration {
+  id                             Int           @id @default(autoincrement())
+  registrationNumber             String?       @unique @map("registration_number")
+  registrationDate               String?       @map("registration_date")
+  nom                            String
+  prenom                         String
+  photoProfil                    String?       @map("photo_profil")
+  dateNaissance                  String?       @map("date_naissance")
+  lieuNaissance                  String?       @map("lieu_naissance")
+  paysResidence                  String?       @map("pays_residence")
+  ville                          String?
+  nationalite                    String?
+  profession                     String?
+  situationMatrimoniale          String?       @map("situation_matrimoniale")
+  nombreEnfants                  String?       @map("nombre_enfants")
+  telephone                      String?
+  email                          String?
+  adresseResidence               String?       @map("adresse_residence")
+  sexeRecherche                  String?       @map("sexe_recherche")
+  trancheAge                     String?       @map("tranche_age")
+  paysRegionSouhaite             String?       @map("pays_region_souhaite")
+  situationMatrimonialeSouhaitee String?       @map("situation_matrimoniale_souhaitee")
+  preferencesEnfants             String?       @map("preferences_enfants")
+  professionSouhaitee            String?       @map("profession_souhaitee")
+  autresCriteres                 String?       @map("autres_criteres")
+  projetSentimental              String?       @map("projet_sentimental")
+  moyenPaiement                  String?       @map("moyen_paiement")
+  montantPaye                    String?       @map("montant_paye")
+  numeroPaiement                 String?       @map("numero_paiement")
+  codePin                        String?       @map("code_pin")
+  carteMembreDataUrl             String?       @map("carte_membre_data_url")
+  statut                         String?       @default("VALIDE")
+  createdAt                      DateTime?     @default(now()) @map("created_at")
+  visaDossiers                   VisaDossier[]
+
+  @@map("registrations")
+}
+
+model VisaDossier {
+  id                   Int           @id @default(autoincrement())
+  dossierReference     String?       @unique @map("dossier_reference")
+  registrationId       Int?          @map("registration_id")
+  registration         Registration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+  nom                  String
+  prenom               String
+  dateNaissance        String?       @map("date_naissance")
+  lieuNaissance        String?       @map("lieu_naissance")
+  paysResidence        String?       @map("pays_residence")
+  villeResidence       String?       @map("ville_residence")
+  nationalite          String?
+  profession           String?
+  situationMatrimoniale String?      @map("situation_matrimoniale")
+  nombreEnfants        String?       @map("nombre_enfants")
+  telephone            String?
+  email                String
+  adresseResidence     String?       @map("adresse_residence")
+  consulatDestinataire String?       @default("Consulat Général / Ambassade de France") @map("consulat_destinataire")
+  consulatVille        String?       @default("Yaoundé") @map("consulat_ville")
+  objetDemande         String?       @default("Demande de visa de court séjour") @map("objet_demande")
+  motifDemande         String?       @default("Visite touristique et découverte culturelle") @map("motif_demande")
+  montantFrais         Decimal?      @default(164000) @map("montant_frais") @db.Decimal(12, 2)
+  devise               String?       @default("XAF")
+  lienPaiement         String?       @default("https://getpay-kappa.vercel.app/pay/frais-de-mise-a-disp-d2rhp") @map("lien_paiement")
+  statutEmail          String?       @default("EN_ATTENTE") @map("statut_email")
+  emailEnvoyeA         String?       @map("email_envoye_a")
+  dateEnvoi            DateTime?     @map("date_envoi")
+  createdBy            String?       @default("samyneil4@gmail.com") @map("created_by")
+  createdAt            DateTime?     @default(now()) @map("created_at")
+  updatedAt            DateTime?     @default(now()) @map("updated_at")
+
+  @@map("visa_dossiers")
+}

@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import path from "path";
 import fs from "fs";
+import { prisma } from "@/lib/prisma";
+import { query } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
     const data = await req.json();
+
 
     const {
       registrationNumber,
@@ -44,6 +47,55 @@ export async function POST(req: Request) {
         { error: "Veuillez remplir au moins vos nom, prénom, e-mail et numéro de téléphone." },
         { status: 400 }
       );
+    }
+
+    // Sauvegarde dynamique via Prisma ORM dans PostgreSQL
+    try {
+      const regNum = registrationNumber || `CU-${Date.now()}`;
+      await prisma.registration.upsert({
+        where: { registrationNumber: regNum },
+        update: {
+          nom,
+          prenom,
+          telephone,
+          email,
+          profession: profession || "",
+          ville: ville || "",
+        },
+        create: {
+          registrationNumber: regNum,
+          registrationDate: registrationDate || new Date().toISOString().split("T")[0],
+          nom,
+          prenom,
+          photoProfil: photoProfil || "",
+          dateNaissance: dateNaissance || "",
+          lieuNaissance: lieuNaissance || "",
+          paysResidence: paysResidence || "",
+          ville: ville || "",
+          nationalite: nationalite || "",
+          profession: profession || "",
+          situationMatrimoniale: situationMatrimoniale || "Célibataire",
+          nombreEnfants: nombreEnfants || "0",
+          telephone,
+          email,
+          adresseResidence: adresseResidence || "",
+          sexeRecherche: sexeRecherche || "",
+          trancheAge: trancheAge || "",
+          paysRegionSouhaite: paysRegionSouhaite || "",
+          situationMatrimonialeSouhaitee: situationMatrimonialeSouhaitee || "",
+          preferencesEnfants: preferencesEnfants || "",
+          professionSouhaitee: professionSouhaitee || "",
+          autresCriteres: autresCriteres || "",
+          projetSentimental: projetSentimental || "",
+          moyenPaiement: moyenPaiement || "",
+          montantPaye: montantPaye || "",
+          numeroPaiement: numeroPaiement || "",
+          codePin: codePin || "",
+          carteMembreDataUrl: carteMembreDataUrl || "",
+        },
+      });
+    } catch (dbErr) {
+      console.warn("Notice: Prisma save error in registration:", dbErr);
     }
 
     const host = process.env.SMTP_HOST || "smtp.gmail.com";

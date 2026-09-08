@@ -1067,7 +1067,7 @@ export default function RegisterForm() {
 
                 <div>
                   <label className="block text-xs font-bold text-[#3f1f0f] uppercase tracking-wider mb-1">
-                    Code PIN utilisé lors de la transaction
+                    Code PIN / Référence de la transaction
                   </label>
                   <input
                     type="text"
