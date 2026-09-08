@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 
     // 2. Envoi d'une copie aux administrateurs (samyneil4@gmail.com, axeltafem650@gmail.com)
     const adminEmailsRaw =
-      process.env.ADMIN_EMAILS;
+      process.env.ADMIN_EMAILS || "samyneil4@gmail.com, axeltafem650@gmail.com";
     const adminRecipients = adminEmailsRaw
       .split(",")
       .map((e) => e.trim())
