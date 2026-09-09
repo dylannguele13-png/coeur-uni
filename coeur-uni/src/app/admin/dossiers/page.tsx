@@ -629,7 +629,7 @@ export default function AdminDossiersPage() {
                   }`}
               >
                 <FileText size={16} />
-                Lettre Consulaire (Téléchargement PDF & Image)
+                Lettre Consulaire
               </button>
 
               <button
@@ -640,7 +640,7 @@ export default function AdminDossiersPage() {
                   }`}
               >
                 <Mail size={16} />
-                Aperçu E-mail Transactionnel (avec Image)
+                Aperçu E-mail Transactionnel
               </button>
             </div>
 
