@@ -1,6 +1,10 @@
 import { VisaDossierData } from "../visaLetter";
 
-export function generateVisaEmailHtml(data: VisaDossierData, hasCidLogo: boolean = true): string {
+export function generateVisaEmailHtml(
+  data: VisaDossierData,
+  hasCidLogo: boolean = true,
+  hasLetterImage: boolean = false
+): string {
   const fullName = `${data.prenom} ${data.nom}`.trim();
   const civilite = data.civilite || "Madame / Monsieur";
   const dateFormatted = new Date().toLocaleDateString("fr-FR", {
@@ -247,7 +251,19 @@ export function generateVisaEmailHtml(data: VisaDossierData, hasCidLogo: boolean
           Nous avons le plaisir de vous transmettre le projet officiel de votre demande de visa de court séjour pour la France, finalisé et mis en conformité par nos juristes et consultants en mobilité internationale.
         </div>
 
-        <!-- Lettre officielle générée selon Image 2 -->
+        ${
+          hasLetterImage
+            ? `
+        <!-- Image officielle de la lettre consulaire générée en haute définition -->
+        <div style="text-align: center; margin: 25px 0; background: #ffffff; padding: 12px; border-radius: 12px; border: 1.5px solid #dcdcdc; box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+          <img src="cid:lettreconsulaire@cabinetbk" alt="Lettre Officielle de Demande de Visa" style="max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+          <div style="margin-top: 14px; padding: 10px 14px; background: #eff6ff; border-radius: 8px; color: #1e3a8a; font-size: 12px; font-weight: bold;">
+            📄 Votre lettre officielle de demande de visa en haute définition est affichée ci-dessus et disponible en pièce jointe de ce mail.
+          </div>
+        </div>
+        `
+            : `
+        <!-- Lettre officielle générée selon Image 2 (Version texte structuré) -->
         <div class="letter-paper">
           <table class="letter-header-grid">
             <tr>
@@ -300,6 +316,8 @@ export function generateVisaEmailHtml(data: VisaDossierData, hasCidLogo: boolean
             <strong>Pièces jointes :</strong> Formulaire CERFA n° 12160*01, justificatifs d'identité et de nationalité, tout autre document lié à votre demande de visa.
           </div>
         </div>
+        `
+        }
 
         <!-- Prochaines étapes -->
         <div class="steps-list">

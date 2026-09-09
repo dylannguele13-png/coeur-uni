@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     // Chercher le logo officiel du Cabinet BK pour l'attachement CID
     const logoBkPath = path.join(process.cwd(), "public", "logo-cabinet-bk.jpeg");
     const hasLogoBk = fs.existsSync(logoBkPath);
-    const attachments = hasLogoBk
+    const attachments: any[] = hasLogoBk
       ? [
         {
           filename: "logo-cabinet-bk.jpeg",
@@ -67,8 +67,27 @@ export async function POST(req: Request) {
       ]
       : [];
 
+    // Attacher la lettre consulaire officielle en image haute définition si disponible
+    const hasLetterImage =
+      typeof data.lettreImageDataUrl === "string" &&
+      data.lettreImageDataUrl.startsWith("data:image/");
+
+    if (hasLetterImage) {
+      try {
+        const base64Data = data.lettreImageDataUrl!.replace(/^data:image\/\w+;base64,/, "");
+        const letterBuffer = Buffer.from(base64Data, "base64");
+        attachments.push({
+          filename: `lettre-demande-visa-${ref}.png`,
+          content: letterBuffer,
+          cid: "lettreconsulaire@cabinetbk",
+        });
+      } catch (imgErr) {
+        console.error("Erreur conversion image lettre base64:", imgErr);
+      }
+    }
+
     // Génération du contenu HTML et texte
-    const emailHtml = generateVisaEmailHtml(fullData, hasLogoBk);
+    const emailHtml = generateVisaEmailHtml(fullData, hasLogoBk, hasLetterImage);
     const emailText = generateVisaLetterText(fullData);
 
     const subject = `📁 Dossier Visa France - Formalités & Lettre Consulaire | ${prenom} ${nom} (${ref})`;

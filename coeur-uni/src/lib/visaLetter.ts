@@ -25,6 +25,7 @@ export interface VisaDossierData {
   lienPaiement?: string;
   statutEmail?: string;
   dateEnvoi?: string;
+  lettreImageDataUrl?: string;
 }
 
 /**

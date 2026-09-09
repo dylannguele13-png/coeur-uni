@@ -25,7 +25,7 @@ import {
   VisaDossierData,
   DEFAULT_JEANNE_MARIE_DOSSIER,
 } from "@/lib/visaLetter";
-import VisaLetterPreview from "@/components/visa/VisaLetterPreview";
+import VisaLetterCanvas from "@/components/visa/VisaLetterCanvas";
 
 export default function AdminDossiersPage() {
   const [activeAdmin, setActiveAdmin] = useState("samyneil4@gmail.com");
@@ -33,6 +33,7 @@ export default function AdminDossiersPage() {
     DEFAULT_JEANNE_MARIE_DOSSIER
   );
   const [activeTab, setActiveTab] = useState<"letter" | "email">("letter");
+  const [lettreImageDataUrl, setLettreImageDataUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [message, setMessage] = useState<{
@@ -167,7 +168,7 @@ export default function AdminDossiersPage() {
     }
 
     const confirmSend = window.confirm(
-      `Confirmez-vous l'envoi du dossier de visa par e-mail à ${formData.prenom} ${formData.nom} (${formData.email}) depuis cabinetbk.immigration@gmail.com ?`
+      `Confirmez-vous l'envoi du dossier de visa par e-mail à ${formData.prenom} ${formData.nom} (${formData.email}) depuis cabinetbk.immigration@gmail.com avec la lettre consulaire en image attachée ?`
     );
     if (!confirmSend) return;
 
@@ -178,7 +179,10 @@ export default function AdminDossiersPage() {
       const res = await fetch("/api/admin/dossiers/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          lettreImageDataUrl,
+        }),
       });
 
       const data = await res.json();
@@ -612,7 +616,7 @@ export default function AdminDossiersPage() {
           </div>
         </section>
 
-        {/* COLONNE DROITE (7 colonnes) : Prévisualisation en direct */}
+        {/* COLONNE DROITE (7 colonnes) : Prévisualisation & Téléchargement direct */}
         <section className="lg:col-span-7 space-y-4">
           {/* Onglets de sélection du mode d'affichage */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -625,7 +629,7 @@ export default function AdminDossiersPage() {
                   }`}
               >
                 <FileText size={16} />
-                Lettre Consulaire (Modèle Image 2)
+                Lettre Consulaire (Téléchargement PDF & Image)
               </button>
 
               <button
@@ -636,7 +640,7 @@ export default function AdminDossiersPage() {
                   }`}
               >
                 <Mail size={16} />
-                Aperçu E-mail Transactionnel
+                Aperçu E-mail Transactionnel (avec Image)
               </button>
             </div>
 
@@ -645,17 +649,15 @@ export default function AdminDossiersPage() {
             </span>
           </div>
 
-          {/* Rendu Onglet 1 : Lettre administrative avec Logo officiel du Cabinet BK */}
-          {activeTab === "letter" && (
-            <div className="bg-stone-100 p-4 md:p-6 rounded-2xl border border-slate-800 shadow-2xl overflow-y-auto max-h-[820px]">
-              <div className="text-xs text-stone-500 uppercase tracking-widest text-center mb-4 font-sans font-semibold">
-                Reproduction conforme du modèle consulaire (Image 2) avec en-tête Cabinet BK
-              </div>
-              <VisaLetterPreview data={formData} />
-            </div>
-          )}
+          {/* Rendu Onglet 1 : Lettre administrative avec Logo officiel du Cabinet BK & Téléchargements direct */}
+          <div className={activeTab === "letter" ? "block space-y-4" : "hidden"}>
+            <VisaLetterCanvas
+              data={formData}
+              onGenerated={setLettreImageDataUrl}
+            />
+          </div>
 
-          {/* Rendu Onglet 2 : E-mail Client avec Logo Cabinet BK & Bouton GetPay */}
+          {/* Rendu Onglet 2 : E-mail Client avec Logo Cabinet BK, Lettre en Image & Bouton GetPay */}
           {activeTab === "email" && (
             <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4 shadow-2xl space-y-3">
               <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-slate-300 space-y-1">
@@ -668,13 +670,19 @@ export default function AdminDossiersPage() {
                 <div>
                   <span className="text-slate-500">Objet :</span> 📁 Dossier Visa France - Formalités & Lettre Consulaire | {formData.prenom} {formData.nom}
                 </div>
+                {lettreImageDataUrl && (
+                  <div className="text-emerald-400 flex items-center gap-1.5 pt-1 border-t border-slate-800 text-[11px]">
+                    <CheckCircle2 size={13} />
+                    <span>Pièce jointe & image intégrée : lettre-demande-visa-{(formData.dossierReference || "REF")}.png (Haute Définition)</span>
+                  </div>
+                )}
               </div>
 
               {/* Aperçu conteneur de l'email */}
-              <div className="bg-white rounded-xl text-slate-900 p-6 shadow-inner max-h-[720px] overflow-y-auto">
+              <div className="bg-white rounded-xl text-slate-900 p-6 shadow-inner max-h-[780px] overflow-y-auto">
                 {/* Logo Cabinet BK dans l'aperçu du mail */}
                 <div className="border-b border-slate-200 pb-4 mb-4 text-center">
-                  <div className="relative w-28 h-28 mx-auto mb-2">
+                  <div className="relative w-24 h-24 mx-auto mb-2">
                     <Image
                       src="/logo-cabinet-bk.jpeg"
                       alt="Logo Cabinet BK"
@@ -688,25 +696,47 @@ export default function AdminDossiersPage() {
                   <p className="text-xs text-blue-800 uppercase tracking-wider font-semibold mt-1">
                     « Votre projet, notre accompagnement »
                   </p>
+                  <div className="inline-block mt-2 px-3 py-1 bg-slate-100 rounded-full text-[11px] font-mono font-bold text-slate-700">
+                    RÉFÉRENCE : {formData.dossierReference || "BK-VISA-REF"}
+                  </div>
                 </div>
 
                 <p className="text-sm text-slate-700 leading-relaxed mb-4">
                   <strong>{formData.civilite || "Madame"} {formData.prenom} {formData.nom}</strong>,<br />
-                  Nous avons le plaisir de vous transmettre le projet officiel de votre demande de visa de court séjour pour la France, finalisé conformément aux normes consulaires.
+                  Nous avons le plaisir de vous transmettre le projet officiel de votre demande de visa de court séjour pour la France, finalisé et mis en conformité par nos juristes et consultants en mobilité internationale.
                 </p>
 
-                {/* Insertion visuelle de la lettre */}
-                <div className="my-4 border border-stone-300 rounded-lg p-4 bg-stone-50 shadow-sm text-xs leading-relaxed text-stone-800">
-                  <div className="font-bold text-stone-900 mb-2">
-                    Objet : {formData.objetDemande || "Demande de visa de court séjour"}
+                {/* Insertion visuelle de la lettre en image haute définition */}
+                {lettreImageDataUrl ? (
+                  <div className="my-5 p-4 bg-slate-50 border-2 border-dashed border-blue-200 rounded-xl text-center shadow-md">
+                    <div className="text-xs font-bold text-blue-900 mb-2 flex items-center justify-center gap-1.5">
+                      <FileText size={15} />
+                      <span>Lettre Consulaire Officielle jointe au courriel (Image HD) :</span>
+                    </div>
+                    <div className="relative max-w-[500px] mx-auto rounded-lg overflow-hidden border border-stone-300 shadow-md">
+                      <img
+                        src={lettreImageDataUrl}
+                        alt="Lettre consulaire officielle en image"
+                        className="w-full h-auto block"
+                      />
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-2.5 italic">
+                      📎 Cette lettre sera reçue par le client directement intégrée dans le corps de l'e-mail et en pièce jointe PNG haute résolution.
+                    </p>
                   </div>
-                  <p className="mb-2">
-                    Je, soussigné(e), <strong>{formData.prenom} {formData.nom}</strong>, né(e) le {formData.dateNaissance} à {formData.lieuNaissance}, sollicite l'octroi d'un visa de court séjour pour la France.
-                  </p>
-                  <p className="italic text-stone-600">
-                    [Corps de lettre complet et annexes CERFA inclus dans le courriel officiel...]
-                  </p>
-                </div>
+                ) : (
+                  <div className="my-4 border border-stone-300 rounded-lg p-4 bg-stone-50 shadow-sm text-xs leading-relaxed text-stone-800">
+                    <div className="font-bold text-stone-900 mb-2">
+                      Objet : {formData.objetDemande || "Demande de visa de court séjour"}
+                    </div>
+                    <p className="mb-2">
+                      Je, soussigné(e), <strong>{formData.prenom} {formData.nom}</strong>, né(e) le {formData.dateNaissance} à {formData.lieuNaissance}, sollicite l'octroi d'un visa de court séjour pour la France.
+                    </p>
+                    <p className="italic text-stone-600">
+                      [Corps de lettre complet et annexes CERFA inclus dans le courriel officiel...]
+                    </p>
+                  </div>
+                )}
 
                 {/* Boîte d'action et bouton GetPay */}
                 <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center my-6">
