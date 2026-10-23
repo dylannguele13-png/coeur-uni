@@ -101,9 +101,14 @@ export default function AdminDossiersPage() {
     const selected = registrations.find((r) => String(r.id) === regId);
     if (!selected) return;
 
+    const regNum = selected.registrationNumber || selected.registration_number;
+    const refCode = regNum ? `BK-VISA-${regNum}` : `BK-VISA-${String(selected.id).padStart(4, "0")}`;
+
     setFormData((prev) => ({
       ...prev,
+      dossierReference: refCode,
       registrationId: selected.id,
+      civilite: prev.civilite || "Madame",
       nom: selected.nom || "",
       prenom: selected.prenom || "",
       dateNaissance: selected.dateNaissance || selected.date_naissance || "",
@@ -119,7 +124,7 @@ export default function AdminDossiersPage() {
       email: selected.email || "",
       adresseResidence: selected.adresseResidence || selected.adresse_residence || "",
       consulatDestinataire: "Consulat Général / Ambassade de France",
-      consulatVille: selected.ville || "Yaoundé",
+      consulatVille: selected.ville || selected.ville_residence || "Yaoundé",
     }));
 
     setMessage({

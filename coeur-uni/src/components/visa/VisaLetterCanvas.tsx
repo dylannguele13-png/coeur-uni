@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import jsPDF from "jspdf";
 import { VisaDossierData } from "@/lib/visaLetter";
-import { Download, FileText, Image as ImageIcon, Check } from "lucide-react";
+import { Download, FileText, Image as ImageIcon } from "lucide-react";
 
 interface VisaLetterCanvasProps {
   data: VisaDossierData;
@@ -12,34 +12,103 @@ interface VisaLetterCanvasProps {
 }
 
 /**
- * Fonction utilitaire de retour à la ligne pour le texte Canvas
+ * Cache mémoire du logo du Cabinet BK pour un rendu ultra rapide et sans latence
+ */
+let cachedLogoImage: HTMLImageElement | null = null;
+let logoLoadingPromise: Promise<HTMLImageElement | null> | null = null;
+
+function loadLogoImage(): Promise<HTMLImageElement | null> {
+  if (cachedLogoImage) {
+    return Promise.resolve(cachedLogoImage);
+  }
+  if (logoLoadingPromise) {
+    return logoLoadingPromise;
+  }
+
+  logoLoadingPromise = new Promise((resolve) => {
+    if (typeof window === "undefined") return resolve(null);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      cachedLogoImage = img;
+      resolve(img);
+    };
+    img.onerror = () => {
+      const fallback = new Image();
+      fallback.crossOrigin = "anonymous";
+      fallback.onload = () => {
+        cachedLogoImage = fallback;
+        resolve(fallback);
+      };
+      fallback.onerror = () => resolve(null);
+      fallback.src = "/logo-cabinet-bk-.png";
+    };
+    img.src = "/logo-cabinet-bk.jpeg";
+  });
+
+  return logoLoadingPromise;
+}
+
+/**
+ * Découpe et retourne les lignes sans dépasser maxWidth, gère les retours à la ligne \n
  */
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
   x: number,
-  y: number,
+  startY: number,
   maxWidth: number,
-  lineHeight: number
+  lineHeight: number,
+  align: CanvasTextAlign = "left"
 ): number {
-  const words = text.split(" ");
-  let line = "";
-  let currentY = y;
+  if (!text) return startY;
+  const originalAlign = ctx.textAlign;
+  ctx.textAlign = align;
 
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + " ";
-    const metrics = ctx.measureText(testLine);
-    const testWidth = metrics.width;
-    if (testWidth > maxWidth && n > 0) {
-      ctx.fillText(line.trim(), x, currentY);
-      line = words[n] + " ";
+  let currentY = startY;
+  const paragraphs = text.split("\n");
+
+  for (const para of paragraphs) {
+    const words = para.trim().split(/\s+/);
+    let line = "";
+
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line ? `${line} ${words[n]}` : words[n];
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && n > 0) {
+        ctx.fillText(line, x, currentY);
+        line = words[n];
+        currentY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line) {
+      ctx.fillText(line, x, currentY);
       currentY += lineHeight;
-    } else {
-      line = testLine;
     }
   }
-  ctx.fillText(line.trim(), x, currentY);
-  return currentY + lineHeight;
+
+  ctx.textAlign = originalAlign;
+  return currentY;
+}
+
+/**
+ * Formate une date ISO YYYY-MM-DD en date française littérale
+ */
+function formatBirthDate(dateStr?: string): string {
+  if (!dateStr) return "N/A";
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    const [, y, m, d] = match;
+    const months = [
+      "janvier", "février", "mars", "avril", "mai", "juin",
+      "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+    ];
+    const monthName = months[parseInt(m, 10) - 1] || m;
+    return `${parseInt(d, 10)} ${monthName} ${y}`;
+  }
+  return dateStr;
 }
 
 export default function VisaLetterCanvas({
@@ -51,29 +120,48 @@ export default function VisaLetterCanvas({
   const [dataUrl, setDataUrl] = useState<string>("");
   const [isRendering, setIsRendering] = useState<boolean>(true);
   const onGeneratedRef = useRef(onGenerated);
+  const prevDataUrlRef = useRef<string>("");
+  const renderIdRef = useRef<number>(0);
 
   useEffect(() => {
     onGeneratedRef.current = onGenerated;
   }, [onGenerated]);
 
-  const fullName = `${data.prenom} ${data.nom}`.trim() || "Nom et prénom(s)";
+  // Valeurs nettoyées et dynamiques
+  const prenom = (data.prenom || "").trim();
+  const nom = (data.nom || "").trim();
+  const fullName = `${prenom} ${nom}`.trim() || "Demandeur";
   const civilite = data.civilite || "Madame";
-  const consulat = data.consulatDestinataire || "Consulat/Ambassade de France";
-  const consulatVille = data.consulatVille || data.villeResidence || "Yaoundé";
-  const ref = data.dossierReference || `BK-VISA-${Date.now().toString().slice(-6)}`;
-  const dateFormatted = new Date().toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const consulat = (data.consulatDestinataire || "").trim() || "Consulat Général / Ambassade de France";
+  const consulatVille = (data.consulatVille || data.villeResidence || "").trim() || "Yaoundé";
+  const ref = data.dossierReference || "BK-VISA-DEMANDE";
+
+  const dateFormatted = useMemo(() => {
+    return new Date().toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  }, []);
 
   const renderCanvas = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Token d'exécution pour annuler tout rendu concurrent précédent
+    const currentRenderId = ++renderIdRef.current;
+
     setIsRendering(true);
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Précharger le logo sans bloquer
+    const logoImg = await loadLogoImage();
+
+    // Si un rendu plus récent a déjà été initié entre-temps, on abandonne immédiatement ce rendu obsolète
+    if (currentRenderId !== renderIdRef.current) {
+      return;
+    }
 
     // Dimensions standard A4 haute résolution (1240 x 1754 px)
     const W = 1240;
@@ -81,67 +169,47 @@ export default function VisaLetterCanvas({
     canvas.width = W;
     canvas.height = H;
 
-    // 1. Fond blanc pur
+    // 1. Réinitialisation complète du fond (blanc immaculé)
+    ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, W, H);
 
-    // Marge générale
+    // Marges et largeur utile
     const marginX = 90;
     const contentWidth = W - marginX * 2;
 
-    // 2. Bande supérieure d'élégance (Bleu marine Cabinet BK)
+    // 2. Liseré supérieur bleu marine Cabinet BK
     ctx.fillStyle = "#0f172a";
     ctx.fillRect(0, 0, W, 8);
 
-    // 3. Charger et dessiner le logo du Cabinet BK
-    let logoLoaded = false;
-    const logoImg = new Image();
-    logoImg.crossOrigin = "anonymous";
-
-    await new Promise<void>((resolve) => {
-      logoImg.onload = () => {
-        logoLoaded = true;
-        resolve();
-      };
-      logoImg.onerror = () => {
-        const fallbackLogo = new Image();
-        fallbackLogo.crossOrigin = "anonymous";
-        fallbackLogo.onload = () => {
-          logoImg.src = fallbackLogo.src;
-          logoLoaded = true;
-          resolve();
-        };
-        fallbackLogo.onerror = () => resolve();
-        fallbackLogo.src = "/logo-cabinet-bk-.png";
-      };
-      logoImg.src = "/logo-cabinet-bk.jpeg";
-    });
-
+    // 3. En-tête officiel Cabinet BK
     const headerY = 50;
-    if (logoLoaded && logoImg.width > 0) {
+    let textStartX = marginX;
+
+    if (logoImg && logoImg.naturalWidth > 0) {
       ctx.drawImage(logoImg, marginX, headerY, 95, 95);
+      textStartX = marginX + 115;
     }
 
-    // Titre et coordonnées du cabinet dans l'en-tête
-    const textStartX = logoLoaded ? marginX + 115 : marginX;
+    // Titre et mentions du Cabinet BK
     ctx.fillStyle = "#0f172a";
-    ctx.font = "bold 22px Arial, sans-serif";
+    ctx.font = "bold 22px Arial, Helvetica, sans-serif";
     ctx.textAlign = "left";
     ctx.fillText("CABINET BK À L'IMMIGRATION FRANÇAISE", textStartX, headerY + 28);
 
     ctx.fillStyle = "#475569";
-    ctx.font = "italic 14px Arial, sans-serif";
+    ctx.font = "italic 14px Arial, Helvetica, sans-serif";
     ctx.fillText("« Votre projet, notre accompagnement »", textStartX, headerY + 52);
 
     ctx.fillStyle = "#1e3a8a";
-    ctx.font = "bold 12px Arial, sans-serif";
+    ctx.font = "bold 12px Arial, Helvetica, sans-serif";
     ctx.fillText(
       "Dossier de Mobilité Consulaire • Accompagnement Visa France",
       textStartX,
       headerY + 74
     );
 
-    // Badge de référence à droite
+    // Badge de référence du dossier à droite
     const badgeW = 280;
     const badgeH = 65;
     const badgeX = W - marginX - badgeW;
@@ -151,12 +219,16 @@ export default function VisaLetterCanvas({
     ctx.strokeStyle = "#cbd5e1";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+    if (typeof ctx.roundRect === "function") {
+      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+    } else {
+      ctx.rect(badgeX, badgeY, badgeW, badgeH);
+    }
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = "#1e3a8a";
-    ctx.font = "bold 11px Arial, sans-serif";
+    ctx.font = "bold 11px Arial, Helvetica, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("DOSSIER DE DEMANDE OFFICIELLE", badgeX + badgeW / 2, badgeY + 26);
 
@@ -172,48 +244,76 @@ export default function VisaLetterCanvas({
     ctx.lineTo(W - marginX, headerY + 115);
     ctx.stroke();
 
-    // 4. En-têtes du document (Demandeur à gauche / Consulat à droite)
+    // 4. Coordonnées du demandeur (Colonne Gauche) et du Consulat (Colonne Droite)
     const infoY = headerY + 155;
+    const colWidth = contentWidth * 0.48; // Largeur maximale stricte pour éviter tout chevauchement
+    let leftY = infoY;
 
-    // Bloc demandeur (Gauche)
+    // --- Colonne Gauche : Demandeur ---
     ctx.textAlign = "left";
     ctx.fillStyle = "#000000";
     ctx.font = "bold 17px 'Times New Roman', Georgia, serif";
-    ctx.fillText(`${civilite} ${fullName}`, marginX, infoY);
+    ctx.fillText(`${civilite} ${fullName}`, marginX, leftY);
+    leftY += 26;
 
     ctx.fillStyle = "#333333";
     ctx.font = "15px 'Times New Roman', Georgia, serif";
-    ctx.fillText(data.adresseResidence || "Adresse de résidence", marginX, infoY + 26);
-    ctx.fillText(
-      `${data.villeResidence || "Yaoundé"}, ${data.paysResidence || "Cameroun"}`,
-      marginX,
-      infoY + 50
-    );
-    ctx.fillText(`N° Téléphone : ${data.telephone || "N/A"}`, marginX, infoY + 74);
-    ctx.fillText(`Email : ${data.email || "N/A"}`, marginX, infoY + 98);
 
-    // Bloc Consulat (Droite)
+    if (data.adresseResidence && data.adresseResidence.trim()) {
+      leftY = wrapText(ctx, data.adresseResidence.trim(), marginX, leftY, colWidth, 22, "left");
+    }
+
+    const villeEtPays = [data.villeResidence, data.paysResidence]
+      .filter((s) => s && s.trim())
+      .join(", ");
+    if (villeEtPays) {
+      ctx.fillText(villeEtPays, marginX, leftY);
+      leftY += 22;
+    }
+
+    if (data.telephone && data.telephone.trim()) {
+      ctx.fillText(`N° Téléphone : ${data.telephone.trim()}`, marginX, leftY);
+      leftY += 22;
+    }
+
+    if (data.email && data.email.trim()) {
+      ctx.fillText(`Email : ${data.email.trim()}`, marginX, leftY);
+      leftY += 22;
+    }
+
+    // --- Colonne Droite : Consulat Destinataire ---
     const rightColX = W - marginX;
+    let rightY = infoY;
     ctx.textAlign = "right";
+
     ctx.fillStyle = "#000000";
     ctx.font = "bold 17px 'Times New Roman', Georgia, serif";
-    ctx.fillText(`${consulat} de ${consulatVille}`, rightColX, infoY);
 
-    ctx.fillStyle = "#555555";
-    ctx.font = "italic 13px 'Times New Roman', Georgia, serif";
-    ctx.fillText(`(Lieu de résidence : ${consulatVille})`, rightColX, infoY + 24);
+    // Formuler le titre consulaire proprement sans doublon
+    let consulatTitre = consulat;
+    if (consulatVille && !consulat.toLowerCase().includes(consulatVille.toLowerCase())) {
+      consulatTitre = `${consulat} à ${consulatVille}`;
+    }
+    ctx.fillText(consulatTitre, rightColX, rightY);
+    rightY += 26;
 
     ctx.fillStyle = "#333333";
     ctx.font = "15px 'Times New Roman', Georgia, serif";
-    ctx.fillText("Service des Visas & Formalités Consulaires", rightColX, infoY + 48);
-    ctx.fillText(consulatVille, rightColX, infoY + 72);
+    ctx.fillText("Service des Visas & Formalités Consulaires", rightColX, rightY);
+    rightY += 24;
+
+    if (consulatVille) {
+      ctx.fillText(consulatVille, rightColX, rightY);
+      rightY += 24;
+    }
 
     ctx.fillStyle = "#000000";
-    ctx.font = "bold 16px 'Times New Roman', Georgia, serif";
-    ctx.fillText(`Date : ${dateFormatted}`, rightColX, infoY + 115);
+    ctx.font = "bold 15px 'Times New Roman', Georgia, serif";
+    ctx.fillText(`Date : ${dateFormatted}`, rightColX, rightY + 12);
+    rightY += 36;
 
-    // 5. Objet de la demande
-    const objetY = infoY + 165;
+    // 5. Objet du courrier (placé sous la colonne la plus longue pour éviter toute superposition)
+    const objetY = Math.max(leftY, rightY) + 30;
     ctx.textAlign = "left";
     ctx.fillStyle = "#000000";
     ctx.font = "bold 18px 'Times New Roman', Georgia, serif";
@@ -228,45 +328,43 @@ export default function VisaLetterCanvas({
     ctx.lineTo(marginX + ctx.measureText(objetText).width, objetY + 6);
     ctx.stroke();
 
-    // 6. Corps de la lettre (Conforme à l'Image 2 et au CERFA)
-    let bodyY = objetY + 55;
-    const bodyLineHeight = 28;
+    // 6. Corps de la lettre officielle conforme au modèle consulaire
+    let bodyY = objetY + 50;
+    const bodyLineHeight = 27;
 
     ctx.font = "bold 16px 'Times New Roman', Georgia, serif";
     ctx.fillText("Madame, Monsieur,", marginX, bodyY);
-    bodyY += 40;
+    bodyY += 36;
 
     ctx.font = "16px 'Times New Roman', Georgia, serif";
 
     // Paragraphe 1 : Identité & demande
-    const p1 = `Je, soussigné(e), ${fullName}, de nationalité ${
-      data.nationalite || "Camerounaise"
-    }, né(e) le ${data.dateNaissance || "N/A"} à ${
-      data.lieuNaissance || "N/A"
-    }, souhaite obtenir un visa de court séjour afin de pouvoir me rendre en France.`;
-    bodyY = wrapText(ctx, p1, marginX, bodyY, contentWidth, bodyLineHeight) + 16;
+    const nationalite = (data.nationalite || "").trim() || "Camerounaise";
+    const dateNaiss = formatBirthDate(data.dateNaissance);
+    const lieu = (data.lieuNaissance || "").trim();
+    const lieuNaiss = lieu ? ` à ${lieu}` : "";
+    const p1 = `Je, soussigné(e), ${fullName}, de nationalité ${nationalite}, né(e) le ${dateNaiss}${lieuNaiss}, souhaite obtenir un visa de court séjour afin de pouvoir me rendre en France.`;
+    bodyY = wrapText(ctx, p1, marginX, bodyY, contentWidth, bodyLineHeight) + 14;
 
     // Paragraphe 2 : Motif
-    const p2 = `Je sollicite un tel visa au motif que : ${
-      data.motifDemande ||
-      "Visite touristique, découverte culturelle et démarches de mobilité"
-    }.`;
-    bodyY = wrapText(ctx, p2, marginX, bodyY, contentWidth, bodyLineHeight) + 16;
+    const motif = (data.motifDemande || "").trim() || "Visite touristique, découverte culturelle et démarches de mobilité";
+    const p2 = `Je sollicite un tel visa au motif que : ${motif}.`;
+    bodyY = wrapText(ctx, p2, marginX, bodyY, contentWidth, bodyLineHeight) + 14;
 
     // Paragraphe 3 : Référence légale CERFA
     const p3 =
       "Conformément aux dispositions du Code de l'entrée et du séjour des étrangers et du droit d'asile, vous trouverez ci-joint les pièces justificatives requises dans une telle situation, notamment le formulaire CERFA n° 12160*01 dûment complété.";
-    bodyY = wrapText(ctx, p3, marginX, bodyY, contentWidth, bodyLineHeight) + 16;
+    bodyY = wrapText(ctx, p3, marginX, bodyY, contentWidth, bodyLineHeight) + 14;
 
     // Paragraphe 4 : Disponibilité
     const p4 =
       "En espérant que vous donnerez une suite favorable à ma présente demande et restant à votre entière disposition pour vous fournir de plus amples renseignements ou justificatifs complémentaires lors de mon entretien,";
-    bodyY = wrapText(ctx, p4, marginX, bodyY, contentWidth, bodyLineHeight) + 16;
+    bodyY = wrapText(ctx, p4, marginX, bodyY, contentWidth, bodyLineHeight) + 14;
 
     // Paragraphe 5 : Formule de politesse
     const p5 =
       "Je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.";
-    bodyY = wrapText(ctx, p5, marginX, bodyY, contentWidth, bodyLineHeight) + 40;
+    bodyY = wrapText(ctx, p5, marginX, bodyY, contentWidth, bodyLineHeight) + 36;
 
     // 7. Bloc Signature
     const sigX = W - marginX - 40;
@@ -275,35 +373,39 @@ export default function VisaLetterCanvas({
     ctx.font = "bold 16px 'Times New Roman', Georgia, serif";
     ctx.fillText("Signature :", sigX, bodyY);
 
-    // Signature stylisée
+    // Signature stylisée du demandeur
     ctx.fillStyle = "#1e3a8a";
     ctx.font = "italic bold 32px 'Brush Script MT', 'Segoe Script', cursive, Georgia";
-    ctx.fillText(fullName, sigX, bodyY + 46);
+    ctx.fillText(fullName, sigX, bodyY + 44);
 
     ctx.fillStyle = "#64748b";
-    ctx.font = "12px Arial, sans-serif";
-    ctx.fillText(fullName.toUpperCase(), sigX, bodyY + 72);
+    ctx.font = "12px Arial, Helvetica, sans-serif";
+    ctx.fillText(fullName.toUpperCase(), sigX, bodyY + 68);
 
     // 8. Cachet officiel de vérification Cabinet BK (En bas à gauche)
-    const stampX = marginX + 70;
-    const stampY = bodyY + 30;
+    const stampX = marginX + 60;
+    const stampY = bodyY + 25;
     ctx.save();
     ctx.strokeStyle = "#1e3a8a";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(stampX - 60, stampY - 20, 200, 60, 6);
+    if (typeof ctx.roundRect === "function") {
+      ctx.roundRect(stampX - 50, stampY - 20, 210, 64, 6);
+    } else {
+      ctx.rect(stampX - 50, stampY - 20, 210, 64);
+    }
     ctx.stroke();
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#1e3a8a";
-    ctx.font = "bold 10px Arial, sans-serif";
-    ctx.fillText("CABINET BK IMMIGRATION", stampX + 40, stampY);
-    ctx.font = "bold 9px Arial, sans-serif";
+    ctx.font = "bold 10px Arial, Helvetica, sans-serif";
+    ctx.fillText("CABINET BK IMMIGRATION", stampX + 55, stampY);
+    ctx.font = "bold 9px Arial, Helvetica, sans-serif";
     ctx.fillStyle = "#059669";
-    ctx.fillText("✓ DOSSIER VÉRIFIÉ & CONFORME", stampX + 40, stampY + 16);
+    ctx.fillText("✓ DOSSIER VÉRIFIÉ & CONFORME", stampX + 55, stampY + 16);
     ctx.font = "8px 'Courier New', monospace";
     ctx.fillStyle = "#64748b";
-    ctx.fillText(`DATE : ${dateFormatted}`, stampX + 40, stampY + 30);
+    ctx.fillText(`DATE : ${dateFormatted}`, stampX + 55, stampY + 32);
     ctx.restore();
 
     // 9. Pièces Jointes en bas de page
@@ -326,14 +428,40 @@ export default function VisaLetterCanvas({
       "Formulaire CERFA n° 12160*01, justificatifs d'identité et de nationalité (passeport), réservation d'hébergement, attestation d'assurance voyage, justificatifs de ressources, tout autre document requis.";
     wrapText(ctx, pjText, marginX + 105, footerY + 26, contentWidth - 105, 20);
 
-    // Export en Data URL
+    // Export en Data URL (seulement si le contenu a changé pour éviter les boucles infinies)
     const url = canvas.toDataURL("image/png", 0.98);
-    setDataUrl(url);
-    if (onGeneratedRef.current) {
-      onGeneratedRef.current(url);
+    if (url !== prevDataUrlRef.current) {
+      prevDataUrlRef.current = url;
+      setDataUrl(url);
+      if (onGeneratedRef.current) {
+        onGeneratedRef.current(url);
+      }
     }
+
     setIsRendering(false);
-  }, [data, fullName, civilite, consulat, consulatVille, ref, dateFormatted]);
+  }, [
+    data.nom,
+    data.prenom,
+    data.civilite,
+    data.dateNaissance,
+    data.lieuNaissance,
+    data.paysResidence,
+    data.villeResidence,
+    data.nationalite,
+    data.telephone,
+    data.email,
+    data.adresseResidence,
+    data.consulatDestinataire,
+    data.consulatVille,
+    data.objetDemande,
+    data.motifDemande,
+    ref,
+    dateFormatted,
+    fullName,
+    civilite,
+    consulat,
+    consulatVille,
+  ]);
 
   useEffect(() => {
     renderCanvas();
@@ -366,7 +494,7 @@ export default function VisaLetterCanvas({
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      {/* Barre d'outils de téléchargement en tête */}
+      {/* Barre d'outils de téléchargement */}
       <div className="w-full flex flex-wrap items-center justify-between gap-3 mb-4 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-md">
         <div className="flex items-center gap-2">
           <FileText size={18} className="text-blue-400" />
@@ -400,7 +528,7 @@ export default function VisaLetterCanvas({
         </div>
       </div>
 
-      {/* Conteneur d'affichage de la lettre générée sur Canvas */}
+      {/* Conteneur de la lettre Canvas A4 */}
       <div className="relative w-full max-w-[760px] overflow-hidden rounded-xl border border-stone-300 shadow-2xl bg-white select-none">
         {isRendering && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/90 backdrop-blur-sm">

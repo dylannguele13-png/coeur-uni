@@ -32,6 +32,7 @@ export interface VisaDossierData {
  * Modèle de données par défaut (Exemple Jeanne Marie demandé par l'utilisateur)
  */
 export const DEFAULT_JEANNE_MARIE_DOSSIER: VisaDossierData = {
+  dossierReference: "BK-VISA-JM01",
   civilite: "Madame",
   nom: "Marie",
   prenom: "Jeanne",
