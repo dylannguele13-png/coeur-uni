@@ -408,8 +408,8 @@ export default function RegisterForm() {
     { num: 2, title: "Coordonnées", icon: "📞" },
     { num: 3, title: "Recherche", icon: "🔍" },
     { num: 4, title: "Projet", icon: "💍" },
-    { num: 5, title: "Règlement", icon: "💳" },
-    { num: 6, title: "Confirmation", icon: "✨" },
+    // { num: 5, title: "Règlement", icon: "💳" },
+    { num: 5, title: "Confirmation", icon: "✨" },
   ];
 
   return (
