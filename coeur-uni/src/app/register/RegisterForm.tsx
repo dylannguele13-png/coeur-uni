@@ -1055,7 +1055,7 @@ export default function RegisterForm() {
               </Link>
             )}
 
-            {step < 6 ? (
+            {step < 5 ? (
               <button
                 type="button"
                 onClick={nextStep}
