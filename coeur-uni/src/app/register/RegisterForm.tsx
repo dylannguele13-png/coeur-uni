@@ -247,22 +247,9 @@ export default function RegisterForm() {
         setErrorMsg("Veuillez saisir une adresse e-mail valide.");
         return;
       }
-    } else if (step === 5) {
-      if (!formData.moyenPaiement) {
-        setErrorMsg("Veuillez sélectionner un moyen de paiement.");
-        return;
-      }
-      if (!formData.montantPaye.trim()) {
-        setErrorMsg("Veuillez indiquer le montant payé pour votre inscription.");
-        return;
-      }
-      if (!formData.numeroPaiement.trim()) {
-        setErrorMsg("Veuillez saisir le numéro de téléphone utilisé pour le règlement.");
-        return;
-      }
     }
 
-    setStep((prev) => Math.min(prev + 1, 6));
+    setStep((prev) => Math.min(prev + 1, 5));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
