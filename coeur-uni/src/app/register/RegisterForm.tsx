@@ -247,9 +247,14 @@ export default function RegisterForm() {
         setErrorMsg("Veuillez saisir une adresse e-mail valide.");
         return;
       }
+    } else if (step === 5) {
+      if (!formData) {
+        setErrorMsg("Veuillez remplir convenablement le formulaire");
+        return;
+      }
     }
 
-    setStep((prev) => Math.min(prev + 1, 5));
+    setStep((prev) => Math.min(prev + 1, 6));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
